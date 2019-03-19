@@ -1,1 +1,13 @@
-﻿  platformGame.vcxproj -> C:\Users\Vince\Documents\2DPlatformGame\Debug\platformGame.exe
+﻿cl : Command line warning D9035: option 'Gm' has been deprecated and will be removed in a future release
+  platformGameMain.cpp
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(76): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(87): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(130): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(198): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(222): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(226): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(233): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(237): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(404): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(418): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  platformGame.vcxproj -> C:\Users\Vince\Documents\2DPlatformGame\Debug\platformGame.exe

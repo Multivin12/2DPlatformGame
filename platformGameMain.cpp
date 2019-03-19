@@ -89,6 +89,7 @@ void display()
 		ground.createOBB(matrix);
 	glPopMatrix();
 
+	cout << "hello" << endl;
 
 	//A new floating platform
 	glColor3f(0.0, 0.0, 1.0);
