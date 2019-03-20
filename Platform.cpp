@@ -54,7 +54,8 @@ void Platform::drawOBB(void) {
  * Uses AABB to do this for now.
  * NOTE: assumes that a collision has previously occured.
 */
-std::string Platform::typeOfCollision(GameCharacter& p) {
+std::string Platform::typeOfCollision(GameCharacter& p,double dt) {
+
 
 	if (!boundingBox.SAT2D(p.boundingBox)) {
 		return "not colliding";
@@ -63,8 +64,11 @@ std::string Platform::typeOfCollision(GameCharacter& p) {
 	OBB platform = boundingBox;
 	OBB player = p.boundingBox;
 
+
 	//Test if the max of a platform is less than the player's minimum plus a certain threshold
-	if (platform.getMaxY() <= player.getMinY()+15.0) {
+	//the threshold is just to compensate for overlap as the object might not necessarily collide perfectly.
+												//128*dt works quite well
+	if (platform.getMaxY() <= player.getMinY()+128.0*dt) {
 		double difference = player.getMinY() - platform.getMaxY();
 		p.YPla -= difference;
 
@@ -72,7 +76,7 @@ std::string Platform::typeOfCollision(GameCharacter& p) {
 	}
 		
 	//Test if the min of a platform is greater than the player's minimum minus a certain threshold
-	if (platform.getMinY() >= player.getMaxY() - 15.0) {
+	if (platform.getMinY() >= player.getMaxY() - 128.0*dt) {
 
 		double difference = player.getMaxY() - platform.getMinY();
 		p.YPla -= difference;

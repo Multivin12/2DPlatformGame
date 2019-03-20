@@ -2,12 +2,15 @@
   platformGameMain.cpp
 c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(76): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
 c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(87): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(130): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
-c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(198): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(222): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(226): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(233): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(237): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(404): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(418): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(126): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(135): warning C4244: 'argument': conversion from 'double' to 'GLfloat', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(204): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(228): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(232): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(239): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(243): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(411): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+c:\users\vince\documents\2dplatformgame\platformgamemain.cpp(425): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  MovingPlatform.cpp
+  Generating Code...
   platformGame.vcxproj -> C:\Users\Vince\Documents\2DPlatformGame\Debug\platformGame.exe

@@ -15,7 +15,7 @@ public:
 	void createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y);
 	void createOBB(float matrix[16]);
 	void drawOBB(void);
-	std::string typeOfCollision(GameCharacter &p);
+	virtual std::string typeOfCollision(GameCharacter &p,double dt);
 	~Platform();
 };
 #endif

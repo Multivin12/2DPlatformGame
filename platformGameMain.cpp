@@ -35,7 +35,7 @@ Platform plat1;
 Platform plat2;
 Platform plat3;
 MovingPlatform plat4;
-vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3 };
+vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
 
 //Simulation properties
 double dt = 0;
@@ -89,7 +89,6 @@ void display()
 		ground.createOBB(matrix);
 	glPopMatrix();
 
-	cout << "hello" << endl;
 
 	//A new floating platform
 	glColor3f(0.0, 0.0, 1.0);
@@ -122,7 +121,13 @@ void display()
 	glPopMatrix();
 
 	//A moving platform
-
+	glColor3f(0.5, 0.5, 0.5);
+	glPushMatrix();
+		glTranslatef(-Xdir+plat4.XPla, -Ydir+plat4.YPla, 0.0);
+		plat4.createPlatformAndDraw(1800, 850, 3000, 850, 3000, 1030, 1800, 1030);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		plat4.createOBB(matrix);
+	glPopMatrix();
 
 	//The NPC
 	glColor3f(1.0, 0.0, 0.0);
@@ -152,9 +157,10 @@ void display()
 		//if it's colliding with the ground then set the collision status to that object corresponding to that object
 		if (isColliding) {
 			player.areCollidingPlatform = true;
-			player.collisionStatuses.push_back(platform->typeOfCollision(player));
+			player.collisionStatuses.push_back(platform->typeOfCollision(player,dt));
 		}
 	}
+
 
 	//so the player is not colliding with anything at all
 	if(player.collisionStatuses.empty()) {
@@ -181,7 +187,7 @@ void display()
 		//if it's colliding with the ground then set the collision status to that object corresponding to that object
 		if (isColliding) {
 			enemy.areCollidingPlatform = true;
-			enemy.collisionStatuses.push_back(platform->typeOfCollision(enemy));
+			enemy.collisionStatuses.push_back(platform->typeOfCollision(enemy,dt));
 		}
 	}
 
@@ -303,6 +309,7 @@ void TimeSimulation() {
 
 void update()
 {
+	plat4.updatePlatformMovement(dt);
 	player.updatePlayerMovement(dt);
 	enemy.updatePlayerMovement(dt);
 }
