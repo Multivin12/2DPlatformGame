@@ -12,7 +12,7 @@ public:
 
 	double XPla = 0.0;
 	double Xspeed = 0.0;
-	double XspeedInc = 1.0f;
+	double XspeedInc = 5.0f;
 	double oldXspeed = 0.0f;
 
 

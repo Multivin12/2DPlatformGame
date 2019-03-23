@@ -272,7 +272,7 @@ void processKeys()
 		//if it's been pressed initially
 		if (!player.jumpPressed) {
 			player.oldYspeed = 0.0f;
-			player.Yspeed = 65.0f;
+			player.Yspeed = player.YspeedInc*dt;
 			player.jumpPressed = true;
 		}
 

@@ -39,8 +39,6 @@ void NPC::updatePlayerMovement(double dt) {
 		Xspeed = -Xspeed;
 	}
 
-	cout << Xspeed << endl;
-
 
 	//Now update the Y movements
 	YPla = YPla + 0.5*(Yspeed + oldYspeed)*dt;
