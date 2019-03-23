@@ -10,8 +10,8 @@
 */
 NPC::NPC():GameCharacter()
 {
-	Xspeed = 8.0f;
-	oldXspeed = 8.0f;
+	Xspeed = 7000.0f;
+	oldXspeed = 7000.0f;
 }
 
 
@@ -20,14 +20,14 @@ NPC::NPC():GameCharacter()
  */
 void NPC::updatePlayerMovement(double dt) {
 
-
 	oldYspeed = Yspeed;
 	oldXspeed = Xspeed;
+
 
 	//update all the X movements
 	//if right has been pressed increase the speed up to 2.0
 	//equation for updating displacement
-	XPla += 0.5f*(Xspeed + oldXspeed)*dt;
+	XPla += 0.5f*(Xspeed*dt + oldXspeed*dt)*dt;
 
 	if (XPla > 860.0f || XPla < 0.0f) {
 		if (XPla < 0.0f) {
@@ -40,6 +40,8 @@ void NPC::updatePlayerMovement(double dt) {
 		Xspeed = -Xspeed;
 	}
 
+	cout << Xspeed * dt << endl;
+
 
 	//Now update the Y movements
 	YPla = YPla + 0.5*(Yspeed + oldYspeed)*dt;
@@ -51,7 +53,7 @@ void NPC::updatePlayerMovement(double dt) {
 
 
 			if (*it == "side") {
-				XPla = XPla - 3.0f*(Xspeed + oldXspeed)*dt;
+				XPla = XPla - 3.0f*(Xspeed*dt + oldXspeed*dt)*dt;
 
 				Xspeed = -Xspeed;
 				oldXspeed = -oldXspeed;

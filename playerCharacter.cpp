@@ -21,7 +21,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 	oldXspeed = Xspeed;
 
 	//update all the X movements
-	//if right has been pressed increase the speed up to 2.0
+	//if right has been pressed increase the speed 
 	if (rightPressed) {
 		if (Xspeed < 30.0) {
 			//equation for updating speed
@@ -29,7 +29,6 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		}
 	} 
 
-	cout << Xspeed << endl;
 
 	//same for left pressed
 	if (leftPressed) {
