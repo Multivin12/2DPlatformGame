@@ -124,7 +124,7 @@ void display()
 	glColor3f(0.5, 0.5, 0.5);
 	glPushMatrix();
 		glTranslatef(-Xdir+plat4.XPla, -Ydir+plat4.YPla, 0.0);
-		plat4.createPlatformAndDraw(1800, 850, 3000, 850, 3000, 1030, 1800, 1030);
+		plat4.createPlatformAndDraw(1600, 850, 2800, 850, 2800, 1030, 1600, 1030);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat4.createOBB(matrix);
 	glPopMatrix();
@@ -137,7 +137,6 @@ void display()
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		enemy.createOBB(matrix);
 	glPopMatrix();
-
 
 	
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -171,7 +170,7 @@ void display()
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
-	//player collisions
+	//enemy collisions
 
 	//This part is for testing which platforms are colliding with the player
 	isColliding = false;

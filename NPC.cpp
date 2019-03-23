@@ -39,6 +39,8 @@ void NPC::updatePlayerMovement(double dt) {
 		Xspeed = -Xspeed;
 	}
 
+	cout << Xspeed << endl;
+
 
 	//Now update the Y movements
 	YPla = YPla + 0.5*(Yspeed + oldYspeed)*dt;
@@ -52,8 +54,8 @@ void NPC::updatePlayerMovement(double dt) {
 			if (*it == "side") {
 				XPla = XPla - 3.0f*(Xspeed + oldXspeed)*dt;
 
-				Xspeed = 0.0f;
-				oldXspeed = 0.0f;
+				Xspeed = -Xspeed;
+				oldXspeed = -oldXspeed;
 			}
 			else if (*it == "top") {
 

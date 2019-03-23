@@ -81,8 +81,6 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		for (std::vector<std::string>::iterator it = collisionStatuses.begin();
 			it != collisionStatuses.end(); it++) {
 
-			cout << *it << endl;
-
 			if (*it == "side") {
 				XPla = XPla - 3.0f*(Xspeed + oldXspeed)*dt;
 

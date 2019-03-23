@@ -50,6 +50,10 @@ std::string MovingPlatform::typeOfCollision(GameCharacter& p,double dt) {
 	if (Xspeed < 0) {
 		p.XPla += Xspeed * dt;
 	}
+
+	if (Xspeed > 0) {
+		p.XPla -= Xspeed * dt;
+	}
 	
 	return "side";
 }
