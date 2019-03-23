@@ -20,6 +20,7 @@ NPC::NPC():GameCharacter()
  */
 void NPC::updatePlayerMovement(double dt) {
 
+
 	oldYspeed = Yspeed;
 	oldXspeed = Xspeed;
 

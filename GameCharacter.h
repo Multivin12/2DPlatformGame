@@ -12,13 +12,13 @@ public:
 
 	double XPla = 0.0;
 	double Xspeed = 0.0;
-	double XspeedInc = 5.0f;
+	double XspeedInc = 1.5f;
 	double oldXspeed = 0.0f;
 
 
 	double YPla = 0;
 	double Yspeed = 0.0f;
-	double YspeedInc = 6.0f;
+	double YspeedInc = 7.5f;
 	double oldYspeed = 0.0f;
 
 	//variable for recording whether the character has collided with a platform or not
