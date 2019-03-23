@@ -17,7 +17,8 @@ GameCharacter::GameCharacter()
 	this->points[3].x = 0.0;
 }
 
-void GameCharacter::addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y) {
+void GameCharacter::addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y,
+	float t1x, float t1y, float t2x, float t2y, float t3x, float t3y, float t4x, float t4y) {
 
 	this->points[0].x = p1x;
 	this->points[0].y = p1y;

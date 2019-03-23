@@ -29,7 +29,9 @@ public:
 	std::vector<std::string> collisionStatuses = {};
 
 	GameCharacter();
-	void addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y);
+	//First 8 coordinates are for the polygon, next 8 are for the texture
+	void addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y,
+		float t1x, float t1y, float t2x, float t2y, float t3x, float t3y, float t4x, float t4y);
 	virtual void updatePlayerMovement(double dt) = 0;
 	void createOBB(float matrix[16]);
 	void drawOBB(void);

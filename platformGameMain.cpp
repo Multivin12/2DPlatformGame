@@ -4,8 +4,9 @@
 
 #include <windows.h>		// Header file for Windows
 #include <iostream>
-#include <gl\gl.h>			// Header file for the OpenGL32 Library
-#include <gl\glu.h>			// Header file for the GLu32 Library
+#include "Image_Loading/nvImage.h"
+#include <gl/GL.h>
+#include <gl/GLU.h>
 #include "OBB.h"
 #include "playerCharacter.h" // Header file for the player character 
 #include "Platform.h" // Header file for the platforms  
@@ -40,7 +41,14 @@ vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.000003;
+double timeFrequencyRecip = 0.000006; // Only needs to be changed to change speed of simulation but is platform independent
+										// Smaller values will slow down the simulation, larger values will speed it up
+
+//Textures
+GLuint astronaut = 0;
+
+//Function for loading in an image
+GLuint loadPNG(char* name);
 
 //Optional added stuff from template
 float mouse_x = 0;
@@ -58,6 +66,14 @@ void rescaleWindow();		//called whenever the viewport needs to be changed by res
 							//when the game character thretens to leave the screen
 void TimeSimulation();
 
+//Display functions
+void displayWorld();		//Method for displaying the game's world.
+void displayScore();		//Method for displaying the scoring system.
+void detectCollisions();	//Method for updating the collisions in the game.
+
+
+
+
 /*************    START OF OPENGL FUNCTIONS   ****************/
 void display()									
 {
@@ -65,26 +81,39 @@ void display()
 	
 	glLoadIdentity();
 
+	rescaleWindow();
+
+	displayWorld();
+
+	displayScore();
+
+	detectCollisions();
+
+	glFlush();
+}
+
+void displayWorld() {
+
 	float matrix[16];
 
-	rescaleWindow();
-	
 	//Character polygon
-	glColor3f(1.0, 1.0, 0.0);
+	glEnable(GL_TEXTURE_2D);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glBindTexture(GL_TEXTURE_2D, astronaut);
+	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
-
-		glTranslatef(player.XPla-Xdir, player.YPla-Ydir, 0.0);
-		player.addPointsandDraw(150.0,180.0,50.0,180.0,50.0,60.0,150.0,60.0);
+		glTranslatef(player.XPla - Xdir, player.YPla - Ydir, 0.0);
+		player.addPointsandDraw(150.0, 180.0, 50.0, 180.0, 50.0, 60.0, 150.0, 60.0);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		player.createOBB(matrix);
-
 	glPopMatrix();
 
 	//The surface
 	glColor3f(0.0, 1.0, 0.0);
 	glPushMatrix();
 		glTranslatef(0.0, -Ydir, 0.0);
-		ground.createPlatformAndDraw(screenWidth*2, 60, 0, 60, 0, 0, screenWidth*2, 0);
+		ground.createPlatformAndDraw(screenWidth * 2, 60, 0, 60, 0, 0, screenWidth * 2, 0);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		ground.createOBB(matrix);
 	glPopMatrix();
@@ -93,14 +122,14 @@ void display()
 	//A new floating platform
 	glColor3f(0.0, 0.0, 1.0);
 	glPushMatrix();
-		glTranslatef(-Xdir,-Ydir, 0.0);
+		glTranslatef(-Xdir, -Ydir, 0.0);
 		plat1.createPlatformAndDraw(1000, 260, 400, 260, 400, 500, 1000, 500);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat1.createOBB(matrix);
 	glPopMatrix();
 
 
-	
+
 	//A new grounded platform
 	glColor3f(1.0, 0.0, 1.0);
 	glPushMatrix();
@@ -123,7 +152,7 @@ void display()
 	//A moving platform
 	glColor3f(0.5, 0.5, 0.5);
 	glPushMatrix();
-		glTranslatef(-Xdir+plat4.XPla, -Ydir+plat4.YPla, 0.0);
+		glTranslatef(-Xdir + plat4.XPla, -Ydir + plat4.YPla, 0.0);
 		plat4.createPlatformAndDraw(1600, 850, 2800, 850, 2800, 1030, 1600, 1030);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat4.createOBB(matrix);
@@ -132,13 +161,19 @@ void display()
 	//The NPC
 	glColor3f(1.0, 0.0, 0.0);
 	glPushMatrix();
-		glTranslatef(-Xdir+enemy.XPla, -Ydir+enemy.YPla, 0.0);
+		glTranslatef(-Xdir + enemy.XPla, -Ydir + enemy.YPla, 0.0);
 		enemy.addPointsandDraw(900, 780, 1000, 780, 1000, 900, 900, 900);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		enemy.createOBB(matrix);
 	glPopMatrix();
+}
 
-	
+void displayScore() {
+
+}
+
+void detectCollisions() {
+
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	//player collisions
 
@@ -156,20 +191,20 @@ void display()
 		//if it's colliding with the ground then set the collision status to that object corresponding to that object
 		if (isColliding) {
 			player.areCollidingPlatform = true;
-			player.collisionStatuses.push_back(platform->typeOfCollision(player,dt));
+			player.collisionStatuses.push_back(platform->typeOfCollision(player, dt));
 		}
 	}
 
 
 	//so the player is not colliding with anything at all
-	if(player.collisionStatuses.empty()) {
+	if (player.collisionStatuses.empty()) {
 		player.areCollidingPlatform = false;
 		//so the player can't jump while in mid air
 		player.jumpPressed = true;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 	//enemy collisions
 
 	//This part is for testing which platforms are colliding with the player
@@ -186,7 +221,7 @@ void display()
 		//if it's colliding with the ground then set the collision status to that object corresponding to that object
 		if (isColliding) {
 			enemy.areCollidingPlatform = true;
-			enemy.collisionStatuses.push_back(platform->typeOfCollision(enemy,dt));
+			enemy.collisionStatuses.push_back(platform->typeOfCollision(enemy, dt));
 		}
 	}
 
@@ -194,9 +229,9 @@ void display()
 	if (enemy.collisionStatuses.empty()) {
 		enemy.areCollidingPlatform = false;
 	}
-
-	glFlush();
 }
+
+
 
 void reshape(int width, int height)		// Resize the OpenGL window
 {
@@ -241,6 +276,33 @@ void rescaleWindow() {
 	else if (player.YPla > (screenHeight*2.0*0.6f)) {
 		Ydir = (player.YPla - screenHeight * 2.0*0.6f + 0.5f*(player.Yspeed + player.oldYspeed)*dt);
 	}
+}
+
+GLuint loadPNG(char* name)
+{
+	// Texture loading object
+	nv::Image img;
+
+	GLuint myTextureID;
+
+	// Return true on success
+	if (img.loadImageFromFile(name))
+	{
+		glGenTextures(1, &myTextureID);
+		glBindTexture(GL_TEXTURE_2D, myTextureID);
+		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+		glTexImage2D(GL_TEXTURE_2D, 0, img.getInternalFormat(), img.getWidth(), img.getHeight(), 0, img.getFormat(), img.getType(), img.getLevel(0));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+	}
+
+	else
+		MessageBox(NULL, "Failed to load texture", "End of the world", MB_OK | MB_ICONINFORMATION);
+
+	return myTextureID;
 }
 
 void init()
