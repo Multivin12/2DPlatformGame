@@ -1,8 +1,5 @@
 #include "GameCharacter.h"
-#include <Windows.h>
-#include <gl\GL.h>
-#include <gl\GLu.h>
-#include <iostream>
+
 
 
 GameCharacter::GameCharacter()
@@ -17,8 +14,34 @@ GameCharacter::GameCharacter()
 	this->points[3].x = 0.0;
 }
 
-void GameCharacter::addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y,
-	float t1x, float t1y, float t2x, float t2y, float t3x, float t3y, float t4x, float t4y) {
+GLuint GameCharacter::loadPNG(char* name)
+{
+	// Texture loading object
+	nv::Image img;
+
+	GLuint myTextureID;
+
+	// Return true on success
+	if (img.loadImageFromFile(name))
+	{
+		glGenTextures(1, &myTextureID);
+		glBindTexture(GL_TEXTURE_2D, myTextureID);
+		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+		glTexImage2D(GL_TEXTURE_2D, 0, img.getInternalFormat(), img.getWidth(), img.getHeight(), 0, img.getFormat(), img.getType(), img.getLevel(0));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+	}
+
+	else
+		MessageBox(NULL, "Failed to load texture", "End of the world", MB_OK | MB_ICONINFORMATION);
+
+	return myTextureID;
+}
+
+void GameCharacter::addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y) {
 
 	this->points[0].x = p1x;
 	this->points[0].y = p1y;
@@ -29,11 +52,33 @@ void GameCharacter::addPointsandDraw(float p1x, float p1y, float p2x, float p2y,
 	this->points[3].x = p4x;
 	this->points[3].y = p4y;
 
-	glBegin(GL_POLYGON);
-	for (int i = 0; i < NUMVERTS; i++) {
-		glVertex2f(points[i].x, points[i].y);
+	if (textureDirection) {
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBegin(GL_POLYGON);
+				glTexCoord2f(0, 0); glVertex2f(points[0].x, points[0].y);
+				glTexCoord2f(0, 1); glVertex2f(points[1].x, points[1].y);
+				glTexCoord2f(1, 1); glVertex2f(points[2].x, points[2].y);
+				glTexCoord2f(1, 0); glVertex2f(points[3].x, points[3].y);
+			glEnd();
+		glDisable(GL_TEXTURE_2D);
 	}
-	glEnd();
+	//to rotate the texture in the opposite direction
+	else if(!(textureDirection)) {
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, textureID);
+		glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+			glBegin(GL_POLYGON);
+				glTexCoord2f(1, 0); glVertex2f(points[0].x, points[0].y);
+				glTexCoord2f(1, 1); glVertex2f(points[1].x, points[1].y);
+				glTexCoord2f(0, 1); glVertex2f(points[2].x, points[2].y);
+				glTexCoord2f(0, 0); glVertex2f(points[3].x, points[3].y);
+			glEnd();
+		glDisable(GL_TEXTURE_2D);
+	}
 }
 
 void GameCharacter::createOBB(float matrix[16]) {
@@ -54,6 +99,10 @@ void GameCharacter::createOBB(float matrix[16]) {
 
 void GameCharacter::drawOBB() {
 	this->boundingBox.drawOBB();
+}
+
+void GameCharacter::loadTexture(char*texturePath) {
+	textureID = loadPNG(texturePath);
 }
 
 GameCharacter::~GameCharacter()

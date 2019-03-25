@@ -26,6 +26,7 @@ std::string MovingPlatform::typeOfCollision(GameCharacter& p,double dt) {
 		double difference = player.getMinY() - platform.getMaxY();
 		p.YPla -= difference;
 
+
 		p.XPla += Xspeed * dt;
 
 		p.YPla += 2.0*Yspeed * dt;
@@ -40,7 +41,6 @@ std::string MovingPlatform::typeOfCollision(GameCharacter& p,double dt) {
 		p.YPla -= difference;
 
 		p.YPla += Yspeed * dt;
-		
 		
 		return "bottom";
 	}

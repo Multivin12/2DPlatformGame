@@ -41,11 +41,13 @@ vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.000006; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.000002; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
 
 //Textures
 GLuint astronaut = 0;
+GLuint background = 0;
+GLuint enemyTexture = 0;
 
 //Function for loading in an image
 GLuint loadPNG(char* name);
@@ -85,8 +87,6 @@ void display()
 
 	displayWorld();
 
-	displayScore();
-
 	detectCollisions();
 
 	glFlush();
@@ -96,18 +96,30 @@ void displayWorld() {
 
 	float matrix[16];
 
-	//Character polygon
+	//the background
 	glEnable(GL_TEXTURE_2D);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glBindTexture(GL_TEXTURE_2D, astronaut);
+	glBindTexture(GL_TEXTURE_2D, background);
+	glPushMatrix();
+		glColor3f(1, 1, 1);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0 + Ydir / (screenHeight * 8.0), 0 + Xdir/(screenWidth * 8.0)); glVertex2f(0, 0);
+			glTexCoord2f(0 + Ydir / (screenHeight * 8.0), 1 + Xdir / (screenWidth * 8.0)); glVertex2f(screenWidth*2.0, 0);
+			glTexCoord2f(1 + Ydir / (screenHeight * 8.0), 1 + Xdir / (screenWidth * 8.0)); glVertex2f(screenWidth*2.0, screenHeight*2.0);
+			glTexCoord2f(1 + Ydir / (screenHeight * 8.0), 0 + Xdir / (screenWidth * 8.0)); glVertex2f(0, screenHeight*2.0);
+		glEnd();
+	glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+	//Character polygon
 	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
 		glTranslatef(player.XPla - Xdir, player.YPla - Ydir, 0.0);
-		player.addPointsandDraw(150.0, 180.0, 50.0, 180.0, 50.0, 60.0, 150.0, 60.0);
+		player.addPointsandDraw(50.0, 60.0, 50.0, 180.0, 150.0, 180.0, 150.0, 60.0);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		player.createOBB(matrix);
 	glPopMatrix();
+
+
 
 	//The surface
 	glColor3f(0.0, 1.0, 0.0);
@@ -310,6 +322,11 @@ void init()
 	glClearColor(0.0,0.0,0.0,0.0);						//sets the clear colour to yellow
 														//glClear(GL_COLOR_BUFFER_BIT) in the display function
 														//will clear the buffer to this colour.
+	//Only call loadPNG on the background
+	background = loadPNG("Sprites/background.png");
+
+	player.loadTexture("Sprites/astronautStill.png");
+	
 }
 
 void processKeys()

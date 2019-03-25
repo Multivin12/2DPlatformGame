@@ -26,6 +26,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		if (Xspeed < 30.0) {
 			//equation for updating speed
 			Xspeed = Xspeed+ XspeedInc*dt;
+			textureDirection = true;
 		}
 	} 
 
@@ -34,6 +35,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 	if (leftPressed) {
 		if (Xspeed > -30.0) {
 			Xspeed = Xspeed - XspeedInc*dt;
+			textureDirection = false;
 		}
 	}
 
@@ -43,6 +45,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 	if (!(rightPressed) && !(leftPressed) && (abs(Xspeed) > XspeedInc)) {
 		if (Xspeed > XspeedInc) {
 			Xspeed -= XspeedInc * dt;
+			
 		}
 		else {
 			Xspeed += XspeedInc * dt;

@@ -2,6 +2,12 @@
 #define GAMECHARACTER_H
 #include "OBB.h"
 #include <vector>
+#include <Windows.h>
+#include "Image_Loading/nvImage.h"
+#include <gl\GL.h>
+#include <gl\GLu.h>
+#include <iostream>
+
 
 using namespace std;
 
@@ -15,6 +21,8 @@ public:
 	double XspeedInc = 1.5f;
 	double oldXspeed = 0.0f;
 
+	GLuint textureID = 0;
+	bool textureDirection = true;
 
 	double YPla = 0;
 	double Yspeed = 0.0f;
@@ -29,9 +37,10 @@ public:
 	std::vector<std::string> collisionStatuses = {};
 
 	GameCharacter();
-	//First 8 coordinates are for the polygon, next 8 are for the texture
-	void addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y,
-		float t1x, float t1y, float t2x, float t2y, float t3x, float t3y, float t4x, float t4y);
+	//First 8 coordinates are for the polygon
+	void loadTexture(char* texturePath);
+	GLuint loadPNG(char* name);
+	void addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y);
 	virtual void updatePlayerMovement(double dt) = 0;
 	void createOBB(float matrix[16]);
 	void drawOBB(void);
