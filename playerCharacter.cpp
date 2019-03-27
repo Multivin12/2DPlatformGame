@@ -110,6 +110,14 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		Yspeed = oldYspeed - YspeedInc * dt;
 	}
 
+	//Now update the textures
+	if (jumpPressed) {
+		loadTexture("Sprites/astronautJump.png");
+	}
+	else {
+		loadTexture("Sprites/astronautStill.png");
+	}
+
 	collisionStatuses.clear();
 }
 

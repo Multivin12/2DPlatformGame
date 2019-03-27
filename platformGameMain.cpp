@@ -18,7 +18,7 @@
 using namespace std;
 
 //Variables for the screenSize and the keys
-int screenWidth=480, screenHeight=480;
+int screenWidth=600, screenHeight=600;
 bool keys[256];
 
 //Variables for adjusting the viewport
