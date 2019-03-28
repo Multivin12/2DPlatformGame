@@ -45,9 +45,7 @@ double timeFrequencyRecip = 0.000002; // Only needs to be changed to change spee
 										// Smaller values will slow down the simulation, larger values will speed it up
 
 //Textures
-GLuint astronaut = 0;
 GLuint background = 0;
-GLuint enemyTexture = 0;
 
 //Function for loading in an image
 GLuint loadPNG(char* name);
@@ -122,20 +120,20 @@ void displayWorld() {
 
 
 	//The surface
-	glColor3f(0.0, 1.0, 0.0);
+	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
 		glTranslatef(0.0, -Ydir, 0.0);
-		ground.createPlatformAndDraw(screenWidth * 2, 60, 0, 60, 0, 0, screenWidth * 2, 0);
+		ground.createPlatformAndDraw(0, 0, 0, 60, screenWidth * 2, 60, screenWidth * 2, 0);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		ground.createOBB(matrix);
 	glPopMatrix();
 
 
-	//A new floating platform
+	//A floating platform
 	glColor3f(0.0, 0.0, 1.0);
 	glPushMatrix();
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat1.createPlatformAndDraw(1000, 260, 400, 260, 400, 500, 1000, 500);
+		plat1.createPlatformAndDraw(400, 260, 400, 500, 1000, 260, 1000, 500);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat1.createOBB(matrix);
 	glPopMatrix();
@@ -326,6 +324,14 @@ void init()
 	background = loadPNG("Sprites/background.png");
 
 	player.loadTexture("Sprites/astronautStill.png");
+
+	for (vector<Platform*>::iterator it = platforms.begin();
+		it != platforms.end(); it++) {
+
+		Platform * platform = *it;
+
+		platform->loadTexture("Sprites/rockPlatformMulti.png");
+	}
 	
 }
 

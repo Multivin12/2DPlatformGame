@@ -21,11 +21,17 @@ void Platform::createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y,
 	this->points[3].x = p4x;
 	this->points[3].y = p4y;
 
-	glBegin(GL_POLYGON);
-	for (int i = 0; i < NUMVERTS; i++) {
-		glVertex2f(points[i].x, points[i].y);
-	}
-	glEnd();
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+	glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBegin(GL_POLYGON);
+			glTexCoord2f(0, 0); glVertex2f(points[0].x, points[0].y);
+			glTexCoord2f(0, 1); glVertex2f(points[1].x, points[1].y);
+			glTexCoord2f(1, 1); glVertex2f(points[2].x, points[2].y);
+			glTexCoord2f(1, 0); glVertex2f(points[3].x, points[3].y);
+		glEnd();
+	glDisable(GL_TEXTURE_2D);
 }
 
 void Platform::createOBB(float matrix[16]) {
@@ -76,7 +82,7 @@ std::string Platform::typeOfCollision(GameCharacter& p,double dt) {
 	}
 		
 	//Test if the min of a platform is greater than the player's minimum minus a certain threshold
-	if (platform.getMinY() >= player.getMaxY() - 96.0*dt) {
+	if (platform.getMinY() >= player.getMaxY() - 110.0*dt) {
 
 		double difference = player.getMaxY() - platform.getMinY();
 		p.YPla -= difference;
@@ -85,6 +91,37 @@ std::string Platform::typeOfCollision(GameCharacter& p,double dt) {
 	}
 
 	return "side";
+}
+
+GLuint Platform::loadPNG(char* name)
+{
+	// Texture loading object
+	nv::Image img;
+
+	GLuint myTextureID;
+
+	// Return true on success
+	if (img.loadImageFromFile(name))
+	{
+		glGenTextures(1, &myTextureID);
+		glBindTexture(GL_TEXTURE_2D, myTextureID);
+		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+		glTexImage2D(GL_TEXTURE_2D, 0, img.getInternalFormat(), img.getWidth(), img.getHeight(), 0, img.getFormat(), img.getType(), img.getLevel(0));
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
+	}
+
+	else
+		MessageBox(NULL, "Failed to load texture", "End of the world", MB_OK | MB_ICONINFORMATION);
+
+	return myTextureID;
+}
+
+void Platform::loadTexture(char*texturePath) {
+	textureID = loadPNG(texturePath);
 }
 
 Platform::~Platform()

@@ -37,9 +37,9 @@ public:
 	std::vector<std::string> collisionStatuses = {};
 
 	GameCharacter();
-	//First 8 coordinates are for the polygon
 	void loadTexture(char* texturePath);
 	GLuint loadPNG(char* name);
+	//First 8 coordinates are for the polygon
 	void addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y);
 	virtual void updatePlayerMovement(double dt) = 0;
 	void createOBB(float matrix[16]);
