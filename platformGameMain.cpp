@@ -41,8 +41,9 @@ vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.000002; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.000008; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
+
 
 //Textures
 GLuint background = 0;
@@ -112,7 +113,7 @@ void displayWorld() {
 	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
 		glTranslatef(player.XPla - Xdir, player.YPla - Ydir, 0.0);
-		player.addPointsandDraw(50.0, 60.0, 50.0, 180.0, 150.0, 180.0, 150.0, 60.0);
+		player.addPointsandDraw(50.0, 120.0, 50.0, 240.0, 150.0, 240.0, 150.0, 120.0);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		player.createOBB(matrix);
 	glPopMatrix();
@@ -120,50 +121,43 @@ void displayWorld() {
 
 
 	//The surface
-	glColor3f(1.0, 1.0, 1.0);
+	glColor3f(1,1,1);
 	glPushMatrix();
 		glTranslatef(0.0, -Ydir, 0.0);
-		ground.createPlatformAndDraw(0, 0, 0, 60, screenWidth * 2, 60, screenWidth * 2, 0);
+		ground.createPlatformAndDraw(0, 0, 0, 120, screenWidth * 2, 120, screenWidth * 2, 0);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		ground.createOBB(matrix);
 	glPopMatrix();
 
-
-	//A floating platform
-	glColor3f(0.0, 0.0, 1.0);
+	//Platforms
+	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat1.createPlatformAndDraw(400, 260, 400, 500, 1000, 260, 1000, 500);
+		plat1.createPlatformAndDraw(400, 260, 400, 500, 1000, 500, 1000, 260);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat1.createOBB(matrix);
 	glPopMatrix();
 
-
-
-	//A new grounded platform
-	glColor3f(1.0, 0.0, 1.0);
 	glPushMatrix();
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat2.createPlatformAndDraw(400, 230, 200, 230, 200, 380, 400, 380);
+		plat2.createPlatformAndDraw(200, 230, 200, 380, 400, 380, 400, 230);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat2.createOBB(matrix);
 	glPopMatrix();
 
 
 	//A platform with an NPC on
-	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat3.createPlatformAndDraw(800, 600, 2000, 600, 2000, 780, 800, 780);
+		plat3.createPlatformAndDraw(800, 600, 800, 780, 2000, 780, 2000, 600);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat3.createOBB(matrix);
 	glPopMatrix();
 
 	//A moving platform
-	glColor3f(0.5, 0.5, 0.5);
 	glPushMatrix();
 		glTranslatef(-Xdir + plat4.XPla, -Ydir + plat4.YPla, 0.0);
-		plat4.createPlatformAndDraw(1600, 850, 2800, 850, 2800, 1030, 1600, 1030);
+		plat4.createPlatformAndDraw(1600, 850, 1600, 1030, 2800, 1030, 2800, 850);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat4.createOBB(matrix);
 	glPopMatrix();
@@ -172,7 +166,7 @@ void displayWorld() {
 	glColor3f(1.0, 0.0, 0.0);
 	glPushMatrix();
 		glTranslatef(-Xdir + enemy.XPla, -Ydir + enemy.YPla, 0.0);
-		enemy.addPointsandDraw(900, 780, 1000, 780, 1000, 900, 900, 900);
+		enemy.addPointsandDraw(900, 780, 900, 900, 1000, 900, 1000, 780);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		enemy.createOBB(matrix);
 	glPopMatrix();
@@ -330,7 +324,7 @@ void init()
 
 		Platform * platform = *it;
 
-		platform->loadTexture("Sprites/rockPlatformMulti.png");
+		platform->loadTexture("Sprites/platform0.png");
 	}
 	
 }
