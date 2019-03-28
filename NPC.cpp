@@ -17,6 +17,7 @@ NPC::NPC():GameCharacter()
 
 /*
  * Method for updating the player's movement when it has collided with something.
+ * Also used for updating the texture.
  */
 void NPC::updatePlayerMovement(double dt) {
 
@@ -38,6 +39,14 @@ void NPC::updatePlayerMovement(double dt) {
 		}
 		oldXspeed = -oldXspeed;
 		Xspeed = -Xspeed;
+
+		if (textureDirection) {
+			textureDirection = false;
+		}
+		else {
+			textureDirection = true;
+		}
+		
 	}
 
 
@@ -49,12 +58,14 @@ void NPC::updatePlayerMovement(double dt) {
 		for (std::vector<std::string>::iterator it = collisionStatuses.begin();
 			it != collisionStatuses.end(); it++) {
 
+			cout << *it << endl;
 
 			if (*it == "side") {
-				XPla = XPla - 3.0f*(Xspeed*dt + oldXspeed*dt)*dt;
+				XPla = XPla - 3.0f*(Xspeed + oldXspeed)*dt;
 
 				Xspeed = -Xspeed;
 				oldXspeed = -oldXspeed;
+
 			}
 			else if (*it == "top") {
 
@@ -73,7 +84,36 @@ void NPC::updatePlayerMovement(double dt) {
 		Yspeed = oldYspeed - YspeedInc * dt;
 	}
 
+	if (Xspeed < 0) {
+		textureDirection = false;
+	}
+	else {
+		textureDirection = true;
+	}
+
+	//now update the texture
+	if (numFrames % 30 == 0) {
+		textureNumber++;
+		switch (textureNumber% 4) {
+
+			case 0: loadTexture("Sprites/alien/blue/blue_walk1.png");
+					break;
+
+			case 1: loadTexture("Sprites/alien/blue/blue_walk2.png");
+					break;
+
+			case 2: loadTexture("Sprites/alien/blue/blue_walk3.png");
+					break;
+
+			case 3: loadTexture("Sprites/alien/blue/blue_walk4.png");
+					break;
+		}
+	}
+
+
+
 	collisionStatuses.clear();
+	numFrames++;
 }
 
 NPC::~NPC()

@@ -18,7 +18,7 @@
 using namespace std;
 
 //Variables for the screenSize and the keys
-int screenWidth=600, screenHeight=600;
+int screenWidth=640, screenHeight=640;
 bool keys[256];
 
 //Variables for adjusting the viewport
@@ -41,8 +41,9 @@ vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.000008; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.000003; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
+										//0.000008 recommended for PC, 0.000003 for my laptop.
 
 
 //Textures
@@ -109,6 +110,7 @@ void displayWorld() {
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 
+
 	//Character polygon
 	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
@@ -118,52 +120,55 @@ void displayWorld() {
 		player.createOBB(matrix);
 	glPopMatrix();
 
-
-
 	//The surface
-	glColor3f(1,1,1);
+	glColor3f(1, 1, 1);
 	glPushMatrix();
-		glTranslatef(0.0, -Ydir, 0.0);
-		ground.createPlatformAndDraw(0, 0, 0, 120, screenWidth * 2, 120, screenWidth * 2, 0);
+		glTranslatef(-Xdir, -Ydir, 0.0);
+		ground.createPlatformAndDraw(-10000, 0, -10000, 120, 10000, 120, 10000, 0, screenWidth, screenHeight);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		ground.createOBB(matrix);
 	glPopMatrix();
 
+
 	//Platforms
+	
 	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
+		plat1.textureWrapType = 1;
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat1.createPlatformAndDraw(400, 260, 400, 500, 1000, 500, 1000, 260);
+		plat1.createPlatformAndDraw(400, 260, 400, 500, 1000, 500, 1000, 260,screenWidth, screenHeight);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat1.createOBB(matrix);
 	glPopMatrix();
 
 	glPushMatrix();
+		plat2.textureWrapType = 1;
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat2.createPlatformAndDraw(200, 230, 200, 380, 400, 380, 400, 230);
+		plat2.createPlatformAndDraw(200, 230, 200, 305, 400, 305, 400, 230, screenWidth, screenHeight);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat2.createOBB(matrix);
 	glPopMatrix();
-
+	
 
 	//A platform with an NPC on
 	glPushMatrix();
+		plat3.textureWrapType = 1;
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat3.createPlatformAndDraw(800, 600, 800, 780, 2000, 780, 2000, 600);
+		plat3.createPlatformAndDraw(800, 600, 800, 780, 2000, 780, 2000, 600, screenWidth, screenHeight);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat3.createOBB(matrix);
 	glPopMatrix();
 
 	//A moving platform
 	glPushMatrix();
+		plat4.textureWrapType = 1;
 		glTranslatef(-Xdir + plat4.XPla, -Ydir + plat4.YPla, 0.0);
-		plat4.createPlatformAndDraw(1600, 850, 1600, 1030, 2800, 1030, 2800, 850);
+		plat4.createPlatformAndDraw(1600, 850, 1600, 1030, 2800, 1030, 2800, 850, screenWidth, screenHeight);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat4.createOBB(matrix);
 	glPopMatrix();
 
 	//The NPC
-	glColor3f(1.0, 0.0, 0.0);
 	glPushMatrix();
 		glTranslatef(-Xdir + enemy.XPla, -Ydir + enemy.YPla, 0.0);
 		enemy.addPointsandDraw(900, 780, 900, 900, 1000, 900, 1000, 780);
@@ -318,15 +323,13 @@ void init()
 	background = loadPNG("Sprites/background.png");
 
 	player.loadTexture("Sprites/astronautStill.png");
+	enemy.loadTexture("Sprites/alienSprites/alien_predator_mask/predatormask__0000_idle_1.png");
+	ground.loadTexture("Sprites/ground2.png");
 
-	for (vector<Platform*>::iterator it = platforms.begin();
-		it != platforms.end(); it++) {
-
-		Platform * platform = *it;
-
-		platform->loadTexture("Sprites/platform0.png");
-	}
-	
+	plat1.loadTexture("Sprites/platform3by2.png");
+	plat2.loadTexture("Sprites/platform3by2.png");
+	plat3.loadTexture("Sprites/platform7by2.png");
+	plat4.loadTexture("Sprites/platform7by2.png");
 }
 
 void processKeys()

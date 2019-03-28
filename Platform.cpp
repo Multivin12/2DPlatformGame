@@ -10,7 +10,7 @@ Platform::Platform()
 {
 }
 
-void Platform::createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y) {
+void Platform::createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y,float screenWidth,float screenHeight) {
 
 	this->points[0].x = p1x;
 	this->points[0].y = p1y;
@@ -26,10 +26,21 @@ void Platform::createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y,
 	glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glBegin(GL_POLYGON);
-			glTexCoord2f(0, 0); glVertex2f(points[0].x, points[0].y);
-			glTexCoord2f(0, 1); glVertex2f(points[1].x, points[1].y);
-			glTexCoord2f(1, 1); glVertex2f(points[2].x, points[2].y);
-			glTexCoord2f(1, 0); glVertex2f(points[3].x, points[3].y);
+			if (textureWrapType == 0) {
+				glTexCoord2f(0, 0); glVertex2f(points[0].x, points[0].y);
+				glTexCoord2f(0, 1); glVertex2f(points[1].x, points[1].y);
+				glTexCoord2f(20000.0/128.0, 1); glVertex2f(points[2].x, points[2].y);
+				glTexCoord2f(20000.0/128.0, 0); glVertex2f(points[3].x, points[3].y);
+			}
+			else if(textureWrapType ==1 ) {
+				glTexCoord2f(0, 0); glVertex2f(points[0].x, points[0].y);
+				glTexCoord2f(0, 1); glVertex2f(points[1].x, points[1].y);
+				glTexCoord2f(1, 1); glVertex2f(points[2].x, points[2].y);
+				glTexCoord2f(1, 0); glVertex2f(points[3].x, points[3].y);
+			}
+			else {
+
+			}
 		glEnd();
 	glDisable(GL_TEXTURE_2D);
 }
@@ -107,10 +118,11 @@ GLuint Platform::loadPNG(char* name)
 		glBindTexture(GL_TEXTURE_2D, myTextureID);
 		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 		glTexImage2D(GL_TEXTURE_2D, 0, img.getInternalFormat(), img.getWidth(), img.getHeight(), 0, img.getFormat(), img.getType(), img.getLevel(0));
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
 	}
 

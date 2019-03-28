@@ -54,6 +54,9 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		if (abs(Xspeed) < XspeedInc) {
 			oldXspeed = 0.0;
 			Xspeed = 0.0;
+			loadTexture("Sprites/astronautStill.png");
+			textureNumber = 0.0;
+			numFrames = 0.0;
 		}
 	}
 
@@ -66,6 +69,9 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		XPla = 0.0;
 		Xspeed = 0.0;
 		oldXspeed = 0.0;
+		loadTexture("Sprites/astronautStill.png");
+		textureNumber = 0.0;
+		numFrames = 0.0;
 	}
 
 	//Now update the Y movements
@@ -90,14 +96,20 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 
 				Xspeed = 0.0f;
 				oldXspeed = 0.0f;
+				loadTexture("Sprites/astronautStill.png");
+				textureNumber = 0.0;
+				numFrames = 0.0;
 			}
 			else if (*it == "top") {
 					
+				if (jumpPressed) {
+					jumpCounter = 0;
+					loadTexture("Sprites/astronautStill.png");
+				}
 				//collision response
 				Yspeed = 0;
 				oldYspeed = 0;
 				jumpPressed = false;
-				jumpCounter = 0;
 			}
 			else if (*it == "bottom") {
 				Yspeed = -2.0f;
@@ -115,8 +127,48 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		loadTexture("Sprites/astronautJump.png");
 	}
 	else {
-		loadTexture("Sprites/astronautStill.png");
+		int frameGap = (int) round((15.0 / abs(Xspeed))*20.0f);
+		//now update the texture
+		if (Xspeed == 0.0) {
+
+		}
+		//(round(15.0/Xspeed)*30.0f) this calculation is so that the sprite switches between images
+		//when it is moving faster.
+		else if (numFrames % frameGap == 0) {
+			textureNumber++;
+			switch (textureNumber % 9) {
+
+			case 0: loadTexture("Sprites/astronautMove1.png");
+				break;
+
+			case 1: loadTexture("Sprites/astronautMove2.png");
+				break;
+
+			case 2: loadTexture("Sprites/astronautMove3.png");
+				break;
+
+			case 3: loadTexture("Sprites/astronautMove4.png");
+				break;
+
+			case 4: loadTexture("Sprites/astronautMove5.png");
+				break;
+
+			case 5: loadTexture("Sprites/astronautMove6.png");
+				break;
+
+			case 6: loadTexture("Sprites/astronautMove7.png");
+				break;
+
+			case 7: loadTexture("Sprites/astronautMove8.png");
+				break;
+
+			case 8: loadTexture("Sprites/astronautMove9.png");
+				break;
+			}
+		}
 	}
+
+	numFrames++;
 
 	collisionStatuses.clear();
 }

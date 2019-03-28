@@ -21,8 +21,11 @@ public:
 	double XspeedInc = 1.5f;
 	double oldXspeed = 0.0f;
 
+	//for recording everything to do with textures
 	GLuint textureID = 0;
 	bool textureDirection = true;
+	int numFrames = 0;
+	int textureNumber = 0;
 
 	double YPla = 0;
 	double Yspeed = 0.0f;
