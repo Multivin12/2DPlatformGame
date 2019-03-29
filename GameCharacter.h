@@ -32,6 +32,8 @@ public:
 	double YspeedInc = 7.5f;
 	double oldYspeed = 0.0f;
 
+	bool flash = false;
+
 	//variable for recording whether the character has collided with a platform or not
 	bool areCollidingPlatform = true;
 	OBB boundingBox;

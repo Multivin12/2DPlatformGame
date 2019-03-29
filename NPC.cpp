@@ -14,6 +14,42 @@ NPC::NPC():GameCharacter()
 	oldXspeed = 15.0f;
 }
 
+/*
+   Method for determining the type of collision the player has made with this NPC.
+*/
+void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
+
+
+	OBB npc = boundingBox;
+	OBB player = p.boundingBox;
+
+	//top side
+	if (!p.coolDown) {
+		if (npc.getMaxY() <= player.getMinY() + 64.0*dt) {
+			p.Yspeed = -p.Yspeed;
+		}
+		//bottom side
+		else if (npc.getMinY() >= player.getMaxY() - 48.0*dt) {
+			p.Yspeed = -0.5f*p.Yspeed;
+			p.livesLeft--;
+			p.coolDown = true;
+		}
+		else {
+			//right side
+			p.Yspeed = 70.0f;
+			if (npc.getMaxX() <= player.getMinX() + 64.0*dt) {
+				p.Xspeed = Xspeed * 2.0;
+			}
+			//left side
+			else if (npc.getMinX() >= player.getMaxX() - 64.0*dt) {
+				p.Xspeed = Xspeed * 2.0;
+			}
+			p.livesLeft--;
+			p.coolDown = true;
+		}
+	}
+}
+
 
 /*
  * Method for updating the player's movement when it has collided with something.
@@ -58,7 +94,6 @@ void NPC::updatePlayerMovement(double dt) {
 		for (std::vector<std::string>::iterator it = collisionStatuses.begin();
 			it != collisionStatuses.end(); it++) {
 
-			cout << *it << endl;
 
 			if (*it == "side") {
 				XPla = XPla - 3.0f*(Xspeed + oldXspeed)*dt;

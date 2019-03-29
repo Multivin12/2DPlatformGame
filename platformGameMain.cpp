@@ -4,6 +4,8 @@
 
 #include <windows.h>		// Header file for Windows
 #include <iostream>
+#include <string>			// used for strings
+#include <sstream>			// used for streaming text
 #include "Image_Loading/nvImage.h"
 #include <gl/GL.h>
 #include <gl/GLU.h>
@@ -14,6 +16,7 @@
 #include "MovingPlatform.h" // Header file for the moving platforms.
 #include <vector>
 #include <chrono>
+#include "Duration.h"
 
 using namespace std;
 
@@ -29,6 +32,7 @@ float Ydir = 0;
 //Object for handling the player character
 PlayerCharacter player;
 NPC enemy;
+vector<NPC*> enemys = { &enemy };
 
 //Object for handling the ground platform
 Platform ground;
@@ -48,9 +52,23 @@ double timeFrequencyRecip = 0.000003; // Only needs to be changed to change spee
 
 //Textures
 GLuint background = 0;
+GLuint livesIcon = 0;
+
+//Duration object to represent the time taken to complete the game
+Duration gameTime;
+auto start_time = std::chrono::steady_clock::now();
+int currentSecondsElapsed = 0;
 
 //Function for loading in an image
 GLuint loadPNG(char* name);
+
+//Boolean to record when the menu of the game is being shown or not
+bool menuShowing = true;
+GLuint	base;				// Base Display List For The Font Set
+HDC			hDC = NULL;		// Private GDI Device Context
+HGLRC		hRC = NULL;		// Permanent Rendering Context
+HWND		hWnd = NULL;		// Holds Our Window Handle
+HINSTANCE	hInstance;		// Holds The Instance Of The Application
 
 //Optional added stuff from template
 float mouse_x = 0;
@@ -77,15 +95,62 @@ void detectCollisions();	//Method for updating the collisions in the game.
 
 
 /*************    START OF OPENGL FUNCTIONS   ****************/
+GLvoid BuildFont(int fontHeight, int fontWidth)								// Build Our Bitmap Font
+{
+	HFONT	font;										// Windows Font ID
+	HFONT	oldfont;									// Used For Good House Keeping
+
+	base = glGenLists(96);								// Storage For 96 Characters
+
+	font = CreateFont(-fontHeight,							// Height Of Font
+		-fontWidth,								// Width Of Font
+		0,								// Angle Of Escapement
+		0,								// Orientation Angle
+		FW_NORMAL,						// Font Weight
+		FALSE,							// Italic
+		FALSE,							// Underline
+		FALSE,							// Strikeout
+		ANSI_CHARSET,					// Character Set Identifier
+		OUT_TT_PRECIS,					// Output Precision
+		CLIP_DEFAULT_PRECIS,			// Clipping Precision
+		ANTIALIASED_QUALITY,			// Output Quality
+		FF_DONTCARE | DEFAULT_PITCH,		// Family And Pitch
+		"Times New Roman");					// Font Name
+
+	oldfont = (HFONT)SelectObject(hDC, font);           // Selects The Font We Want
+	wglUseFontBitmaps(hDC, 32, 96, base);				// Builds 96 Characters Starting At Character 32
+	SelectObject(hDC, oldfont);							// Selects The Font We Want
+	DeleteObject(font);									// Delete The Font
+}
+
+GLvoid glPrint(string fmt)					// Custom GL "Print" Routine
+{
+	stringstream stream;
+	stream << fmt;
+
+	glPushAttrib(GL_LIST_BIT);							// Pushes The Display List Bits
+	glListBase(base - 32);								// Sets The Base Character to 32
+														// first 32 chars not used
+	glCallLists(stream.str().size(), GL_UNSIGNED_BYTE, stream.str().c_str());	// Draws The Display List Text
+	glPopAttrib();										// Pops The Display List Bits
+}
+
 void display()									
 {
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	
 	glLoadIdentity();
 
 	rescaleWindow();
 
 	displayWorld();
+
+	//to update the time for the scoreboard
+	auto current_time = std::chrono::steady_clock::now();
+	currentSecondsElapsed = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+	gameTime.convertFromSeconds(currentSecondsElapsed);
+
+	displayScore();
 
 	detectCollisions();
 
@@ -103,9 +168,9 @@ void displayWorld() {
 		glColor3f(1, 1, 1);
 		glBegin(GL_QUADS);
 			glTexCoord2f(0 + Ydir / (screenHeight * 8.0), 0 + Xdir/(screenWidth * 8.0)); glVertex2f(0, 0);
-			glTexCoord2f(0 + Ydir / (screenHeight * 8.0), 1 + Xdir / (screenWidth * 8.0)); glVertex2f(screenWidth*2.0, 0);
-			glTexCoord2f(1 + Ydir / (screenHeight * 8.0), 1 + Xdir / (screenWidth * 8.0)); glVertex2f(screenWidth*2.0, screenHeight*2.0);
-			glTexCoord2f(1 + Ydir / (screenHeight * 8.0), 0 + Xdir / (screenWidth * 8.0)); glVertex2f(0, screenHeight*2.0);
+			glTexCoord2f(0 + Ydir / (screenHeight * 8.0), 4 + Xdir / (screenWidth * 8.0)); glVertex2f(screenWidth*2.0, 0);
+			glTexCoord2f(4 + Ydir / (screenHeight * 8.0), 4 + Xdir / (screenWidth * 8.0)); glVertex2f(screenWidth*2.0, screenHeight*2.0);
+			glTexCoord2f(4 + Ydir / (screenHeight * 8.0), 0 + Xdir / (screenWidth * 8.0)); glVertex2f(0, screenHeight*2.0);
 		glEnd();
 	glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
@@ -175,16 +240,69 @@ void displayWorld() {
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		enemy.createOBB(matrix);
 	glPopMatrix();
+	enemy.drawOBB();
 }
 
 void displayScore() {
 
+	// Position The Text On The Screen
+	//print the elapsed time
+	string secString;
+	string minString;
+	string hourString;
+
+	if (gameTime.seconds < 10) {
+		secString = "0" + std::to_string(gameTime.seconds);
+	}
+	else {
+		secString = std::to_string(gameTime.seconds);
+	}
+
+	if (gameTime.minutes < 10) {
+		minString = "0" + std::to_string(gameTime.minutes);
+	}
+	else {
+		minString = std::to_string(gameTime.minutes);
+	}
+
+	if (gameTime.hours < 10) {
+		hourString = "0" + std::to_string(gameTime.hours);
+	}
+	else {
+		hourString = std::to_string(gameTime.hours);
+	}
+
+	glRasterPos2f(screenWidth * 2 - 640, screenHeight * 2 - 100);
+	glColor3f(1.0, 1.0, 1.0);
+	glPrint("Time Taken: " + hourString + ":" + minString + ":" + secString);	// Print GL Text To The Screen
+
+	//Now display the health of the player
+	//the background
+
+	int Xdirection = 120;
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, livesIcon);
+	for (int i = 0; i < player.livesLeft; i++) {
+		glPushMatrix();
+			glTranslatef(Xdirection, screenHeight*2.0 - 150.0, 0.0);
+			glBegin(GL_QUADS);
+				glTexCoord2f(0, 0); glVertex2f(0, 0);
+				glTexCoord2f(0, 1); glVertex2f(0, 100);
+				glTexCoord2f(1, 1); glVertex2f(70, 100);
+				glTexCoord2f(1, 0); glVertex2f(70, 0);
+			glEnd();
+		glPopMatrix();
+		Xdirection += 60;
+	}
+	glDisable(GL_TEXTURE_2D);
 }
 
 void detectCollisions() {
 
 	//////////////////////////////////////////////////////////////////////////////////////////////////////
 	//player collisions
+	//Platform collisions
 
 	//This part is for testing which platforms are colliding with the player
 	bool isColliding = false;
@@ -204,12 +322,28 @@ void detectCollisions() {
 		}
 	}
 
-
 	//so the player is not colliding with anything at all
 	if (player.collisionStatuses.empty()) {
 		player.areCollidingPlatform = false;
 		//so the player can't jump while in mid air
 		player.jumpPressed = true;
+	}
+
+	//NPC Collisions
+	//This part is for testing which platforms are colliding with the player
+	isColliding = false;
+
+	for (vector<NPC*>::iterator it = enemys.begin();
+		it != enemys.end(); it++) {
+
+		NPC * npc = *it;
+
+		//For handling collisions
+		isColliding = player.boundingBox.SAT2D(npc->boundingBox);
+
+		if (isColliding) {
+			npc->typeOfCollision(player, dt);
+		}
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,6 +393,8 @@ void reshape(int width, int height)		// Resize the OpenGL window
 
 	glMatrixMode(GL_MODELVIEW);							// Select the modelview matrix stack
 	glLoadIdentity();									// Reset the top of the modelview matrix to an identity matrix
+
+	BuildFont((int) round((double) screenHeight/30.0), (int) round((double)screenHeight / 60.0));
 }
 
 void rescaleWindow() {
@@ -319,8 +455,11 @@ void init()
 	glClearColor(0.0,0.0,0.0,0.0);						//sets the clear colour to yellow
 														//glClear(GL_COLOR_BUFFER_BIT) in the display function
 														//will clear the buffer to this colour.
+
+	BuildFont((int)round((double)screenHeight / 30.0), (int)round((double)screenHeight / 60.0));		// Build The Font
 	//Only call loadPNG on the background
 	background = loadPNG("Sprites/background.png");
+	livesIcon = loadPNG("Sprites/astronautStill.png");
 
 	player.loadTexture("Sprites/astronautStill.png");
 	enemy.loadTexture("Sprites/alienSprites/alien_predator_mask/predatormask__0000_idle_1.png");
@@ -401,12 +540,6 @@ LRESULT	CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);	// Declaration For WndProc
 void KillGLWindow();									// releases and destroys the window
 bool CreateGLWindow(char* title, int width, int height); //creates the window
 int WINAPI WinMain(	HINSTANCE, HINSTANCE, LPSTR, int);  // Win32 main function
-
-//win32 global variabless
-HDC			hDC=NULL;		// Private GDI Device Context
-HGLRC		hRC=NULL;		// Permanent Rendering Context
-HWND		hWnd=NULL;		// Holds Our Window Handle
-HINSTANCE	hInstance;		// Holds The Instance Of The Application
 
 
 /******************* WIN32 FUNCTIONS ***************************/

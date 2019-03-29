@@ -52,6 +52,13 @@ void GameCharacter::addPointsandDraw(float p1x, float p1y, float p2x, float p2y,
 	this->points[3].x = p4x;
 	this->points[3].y = p4y;
 
+	if (flash) {
+		glColor3f(0, 0, 0);
+	}
+	else {
+		glColor3f(1, 1, 1);
+	}
+
 	if (textureDirection) {
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textureID);

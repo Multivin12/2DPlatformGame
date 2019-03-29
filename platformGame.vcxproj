@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Duration.cpp" />
     <ClCompile Include="GameCharacter.cpp" />
     <ClCompile Include="MovingPlatform.cpp" />
     <ClCompile Include="NPC.cpp" />
@@ -20,6 +21,7 @@
     <ClCompile Include="playerCharacter.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Duration.h" />
     <ClInclude Include="GameCharacter.h" />
     <ClInclude Include="MovingPlatform.h" />
     <ClInclude Include="NPC.h" />

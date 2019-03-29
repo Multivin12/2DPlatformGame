@@ -17,6 +17,11 @@ public:
 	//counter to count how long the jump button has been hold down for
 	int jumpCounter = 0;
 
+	int livesLeft = 3;
+
+	bool coolDown = false;
+	int coolDownTime = 0;
+
 	PlayerCharacter();
 	void updatePlayerMovement(double dt);
 	~PlayerCharacter();

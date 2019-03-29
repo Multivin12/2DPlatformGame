@@ -122,11 +122,39 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		Yspeed = oldYspeed - YspeedInc * dt;
 	}
 
+	if (coolDown) {
+		coolDownTime++;
+		//to determine when the game charater should flash
+		if (100 < coolDownTime && coolDownTime < 150 ||
+			200 < coolDownTime && coolDownTime < 250 || 
+			300 < coolDownTime && coolDownTime < 350 || 
+			400 < coolDownTime && coolDownTime < 450 || 
+			500 < coolDownTime && coolDownTime < 550 || 
+			600 < coolDownTime && coolDownTime < 650 || 
+			700 < coolDownTime && coolDownTime < 750 || 
+			800 < coolDownTime && coolDownTime < 850 || 
+			900 < coolDownTime && coolDownTime < 950 ) {
+			flash = true;
+		}
+		else {
+			flash = false;
+		}
+		if (numFrames % 10 == 0) {
+			glColor3f(0, 0, 0);
+		}
+
+		if (coolDownTime == 1000) {
+			coolDown = false;
+			coolDownTime = 0;
+		}
+	}
+
 	//Now update the textures
 	if (jumpPressed) {
 		loadTexture("Sprites/astronautJump.png");
 	}
 	else {
+		
 		int frameGap = (int) round((15.0 / abs(Xspeed))*20.0f);
 		//now update the texture
 		if (Xspeed == 0.0) {
@@ -135,6 +163,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		//(round(15.0/Xspeed)*30.0f) this calculation is so that the sprite switches between images
 		//when it is moving faster.
 		else if (numFrames % frameGap == 0) {
+
 			textureNumber++;
 			switch (textureNumber % 9) {
 
