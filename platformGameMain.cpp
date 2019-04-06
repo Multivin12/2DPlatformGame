@@ -24,6 +24,11 @@ using namespace std;
 int screenWidth=640, screenHeight=640;
 bool keys[256];
 
+int numFrames = 0;
+
+bool displayTitlePage = true;
+bool displayInstructions = false;
+
 //Variables for adjusting the viewport
 //Xdir and Ydir is the amount to move the objects by 
 float Xdir = 0;
@@ -53,6 +58,14 @@ double timeFrequencyRecip = 0.000003; // Only needs to be changed to change spee
 //Textures
 GLuint background = 0;
 GLuint livesIcon = 0;
+//Textures for the title screen
+GLuint backgroundTitle = 0;
+GLuint startGameButton = 0;
+GLuint instructionsButton = 0;
+GLuint startGameButtonIcon = 0;
+GLuint instructionsButtonIcon = 0;
+GLuint constantImage = 0;
+GLuint instructionsImage = 0;
 
 //Duration object to represent the time taken to complete the game
 Duration gameTime;
@@ -62,8 +75,8 @@ int currentSecondsElapsed = 0;
 //Function for loading in an image
 GLuint loadPNG(char* name);
 
-//Boolean to record when the menu of the game is being shown or not
-bool menuShowing = true;
+
+
 GLuint	base;				// Base Display List For The Font Set
 HDC			hDC = NULL;		// Private GDI Device Context
 HGLRC		hRC = NULL;		// Permanent Rendering Context
@@ -73,7 +86,7 @@ HINSTANCE	hInstance;		// Holds The Instance Of The Application
 //Optional added stuff from template
 float mouse_x = 0;
 float mouse_y = 0;
-bool LeftPressed = false;
+bool leftPressed = false;
 
 
 //OPENGL FUNCTION PROTOTYPES
@@ -90,6 +103,7 @@ void TimeSimulation();
 void displayWorld();		//Method for displaying the game's world.
 void displayScore();		//Method for displaying the scoring system.
 void detectCollisions();	//Method for updating the collisions in the game.
+void displayTitle();
 
 
 
@@ -143,16 +157,21 @@ void display()
 
 	rescaleWindow();
 
-	displayWorld();
+	if (displayTitlePage) {
+		displayTitle();
+	}
+	else {
+		displayWorld();
 
-	//to update the time for the scoreboard
-	auto current_time = std::chrono::steady_clock::now();
-	currentSecondsElapsed = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
-	gameTime.convertFromSeconds(currentSecondsElapsed);
+		//to update the time for the scoreboard
+		auto current_time = std::chrono::steady_clock::now();
+		currentSecondsElapsed = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+		gameTime.convertFromSeconds(currentSecondsElapsed);
 
-	displayScore();
+		displayScore();
 
-	detectCollisions();
+		detectCollisions();
+	}
 
 	glFlush();
 }
@@ -240,7 +259,6 @@ void displayWorld() {
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		enemy.createOBB(matrix);
 	glPopMatrix();
-	enemy.drawOBB();
 }
 
 void displayScore() {
@@ -374,6 +392,134 @@ void detectCollisions() {
 	}
 }
 
+//Method for displaying the title screen when the game first launches
+void displayTitle() {
+
+	if (!displayInstructions) {
+		if (mouse_y > screenHeight / 2.0 && mouse_y < screenHeight*0.7) {
+			if (instructionsButtonIcon != constantImage) {
+				startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
+				instructionsButtonIcon = loadPNG("Sprites/background.png");
+			}
+			if (leftPressed) {
+				displayTitlePage = false;
+				start_time = std::chrono::steady_clock::now();
+			}
+		}
+		else if (mouse_y < screenHeight / 2.0 && mouse_y > screenHeight*0.3) {
+			if (startGameButtonIcon != constantImage) {
+				instructionsButtonIcon = loadPNG("Sprites/astronautStill.png");
+				startGameButtonIcon = loadPNG("Sprites/background.png");
+			}
+			if (leftPressed) {
+				displayInstructions = true;
+			}
+		}
+		else {
+			if (startGameButtonIcon != constantImage && instructionsButtonIcon != constantImage) {
+				instructionsButtonIcon = loadPNG("Sprites/background.png");
+				startGameButtonIcon = loadPNG("Sprites/background.png");
+			}
+		}
+	}
+	else {
+		numFrames++;
+		if (numFrames > 100) {
+			if (leftPressed) {
+				displayInstructions = false;
+				displayTitlePage = false;
+				start_time = std::chrono::steady_clock::now();
+			}
+		}
+	}
+	
+
+	//the background
+	glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, background);
+		glPushMatrix();
+		glColor3f(1.0, 1.0, 1.0);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0, 0); glVertex2f(0, 0);
+			glTexCoord2f(0, 4); glVertex2f(screenWidth*2.0, 0);
+			glTexCoord2f(4, 4); glVertex2f(screenWidth*2.0, screenHeight*2.0);
+			glTexCoord2f(4, 0); glVertex2f(0, screenHeight*2.0);
+		glEnd();
+		glPopMatrix();
+	glDisable(GL_TEXTURE_2D);
+
+	if (!displayInstructions) {
+		//start buttons
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, startGameButton);
+			glPushMatrix();
+			glTranslatef(330, screenHeight * 2 - 600, 0);
+			glBegin(GL_QUADS);
+				glTexCoord2f(0, 0); glVertex2f(0, 0);
+				glTexCoord2f(1, 0); glVertex2f(screenWidth, 0);
+				glTexCoord2f(1, 1); glVertex2f(screenWidth, (screenHeight*2.0) / 8.0);
+				glTexCoord2f(0, 1); glVertex2f(0, (screenHeight*2.0) / 8.0);
+			glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, startGameButtonIcon);
+			glPushMatrix();
+			glTranslatef(240, 700, 0);
+			glBegin(GL_QUADS);
+				glTexCoord2f(0, 0); glVertex2f(0, 0);
+				glTexCoord2f(1, 0); glVertex2f(80, 0);
+				glTexCoord2f(1, 1); glVertex2f(80, 120);
+				glTexCoord2f(0, 1); glVertex2f(0, 120);
+			glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		//instructions button
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, instructionsButton);
+			glPushMatrix();
+			glTranslatef(330, screenHeight * 2 - 800, 0);
+			glBegin(GL_QUADS);
+				glTexCoord2f(0, 0); glVertex2f(0, 0);
+				glTexCoord2f(1, 0); glVertex2f(screenWidth, 0);
+				glTexCoord2f(1, 1); glVertex2f(screenWidth, (screenHeight*2.0) / 8.0);
+				glTexCoord2f(0, 1); glVertex2f(0, (screenHeight*2.0) / 8.0);
+			glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, instructionsButtonIcon);
+			glPushMatrix();
+			glTranslatef(240, 500, 0);
+			glBegin(GL_QUADS);
+				glTexCoord2f(0, 0); glVertex2f(0, 0);
+				glTexCoord2f(1, 0); glVertex2f(80, 0);
+				glTexCoord2f(1, 1); glVertex2f(80, 120);
+				glTexCoord2f(0, 1); glVertex2f(0, 120);
+			glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+	}
+	else {
+		//the background
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, instructionsImage);
+			glPushMatrix();
+			glColor3f(1.0, 1.0, 1.0);
+			glBegin(GL_QUADS);
+				glTexCoord2f(0, 0); glVertex2f(0, 0);
+				glTexCoord2f(1, 0); glVertex2f(screenWidth*2.0, 0);
+				glTexCoord2f(1, 1); glVertex2f(screenWidth*2.0, screenHeight*2.0);
+				glTexCoord2f(0, 1); glVertex2f(0, screenHeight*2.0);
+			glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+	}
+}
+
 
 
 void reshape(int width, int height)		// Resize the OpenGL window
@@ -394,7 +540,8 @@ void reshape(int width, int height)		// Resize the OpenGL window
 	glMatrixMode(GL_MODELVIEW);							// Select the modelview matrix stack
 	glLoadIdentity();									// Reset the top of the modelview matrix to an identity matrix
 
-	BuildFont((int) round((double) screenHeight/30.0), (int) round((double)screenHeight / 60.0));
+	BuildFont((int)round((double)screenHeight / 30.0), (int)round((double)screenHeight / 60.0));
+	
 }
 
 void rescaleWindow() {
@@ -438,7 +585,7 @@ GLuint loadPNG(char* name)
 		glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
 		glTexImage2D(GL_TEXTURE_2D, 0, img.getInternalFormat(), img.getWidth(), img.getHeight(), 0, img.getFormat(), img.getType(), img.getLevel(0));
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 		glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAX_ANISOTROPY_EXT, 16.0f);
@@ -456,10 +603,17 @@ void init()
 														//glClear(GL_COLOR_BUFFER_BIT) in the display function
 														//will clear the buffer to this colour.
 
-	BuildFont((int)round((double)screenHeight / 30.0), (int)round((double)screenHeight / 60.0));		// Build The Font
+
+	BuildFont((int)round((double)screenHeight / 30.0), (int)round((double)screenHeight / 60.0));
+
 	//Only call loadPNG on the background
 	background = loadPNG("Sprites/background.png");
 	livesIcon = loadPNG("Sprites/astronautStill.png");
+	startGameButton = loadPNG("Sprites/startGame.png");
+	instructionsButton = loadPNG("Sprites/instructions.png");
+	backgroundTitle = loadPNG("Sprites/Ground/ground5.png");
+	constantImage = loadPNG("Sprites/background.png");
+	instructionsImage = loadPNG("Sprites/instructionsPage.png");
 
 	player.loadTexture("Sprites/astronautStill.png");
 	enemy.loadTexture("Sprites/alienSprites/alien_predator_mask/predatormask__0000_idle_1.png");
@@ -473,40 +627,42 @@ void init()
 
 void processKeys()
 {
-
-	if (keys[VK_LEFT])
-	{
-		player.leftPressed = true;
-	}
-	else {
-		player.leftPressed = false;
-	}
-	if (keys[VK_RIGHT])
-	{
-		player.rightPressed = true;
-	}
-	else {
-		player.rightPressed = false;
-	}
-	if (keys[VK_UP] || keys[VK_SPACE]) {
-
-		//if it's been pressed initially
-		if (!player.jumpPressed) {
-			player.oldYspeed = 0.0f;
-			player.Yspeed = 70.0f;
-			player.jumpPressed = true;
-		}
-
-		player.jumpCounter++;
-	}
-	else {
-		if (player.jumpPressed) {
-			player.jumpCounter--;
+	if (!displayTitlePage) {
+		if (keys[VK_LEFT])
+		{
+			player.leftPressed = true;
 		}
 		else {
-			player.jumpCounter = 0;
+			player.leftPressed = false;
+		}
+		if (keys[VK_RIGHT])
+		{
+			player.rightPressed = true;
+		}
+		else {
+			player.rightPressed = false;
+		}
+		if (keys[VK_UP] || keys[VK_SPACE]) {
+
+			//if it's been pressed initially
+			if (!player.jumpPressed) {
+				player.oldYspeed = 0.0f;
+				player.Yspeed = 70.0f;
+				player.jumpPressed = true;
+			}
+
+			player.jumpCounter++;
+		}
+		else {
+			if (player.jumpPressed) {
+				player.jumpCounter--;
+			}
+			else {
+				player.jumpCounter = 0;
+			}
 		}
 	}
+	
 }
 
 void TimeSimulation() {
@@ -623,13 +779,13 @@ LRESULT CALLBACK WndProc(	HWND	hWnd,			// Handle For This Window
 			{
 	            mouse_x = LOWORD(lParam);          
 				mouse_y = screenHeight - HIWORD(lParam);
-				LeftPressed = true;
+				leftPressed = true;
 			}
 		break;
 
 		case WM_LBUTTONUP:
 			{
-	            LeftPressed = false;
+	            leftPressed = false;
 			}
 		break;
 

@@ -9,7 +9,8 @@
 class NPC : public GameCharacter
 {
 public:
-
+	bool isDead = false;
+	bool deleteObj = false;
 
 	NPC();
 	void updatePlayerMovement(double dt);
