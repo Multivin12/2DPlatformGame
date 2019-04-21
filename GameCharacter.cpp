@@ -52,7 +52,7 @@ void GameCharacter::addPointsandDraw(float p1x, float p1y, float p2x, float p2y,
 	this->points[3].x = p4x;
 	this->points[3].y = p4y;
 
-	if (flash) {
+	if (flash || collidingSpaceship) {
 		glColor3f(0, 0, 0);
 	}
 	else {
@@ -108,9 +108,17 @@ void GameCharacter::drawOBB() {
 	this->boundingBox.drawOBB();
 }
 
-void GameCharacter::loadTexture(char*texturePath) {
-	textureID = loadPNG(texturePath);
+void GameCharacter::loadTexture(string texturePath) {
+
+	char * cstr = new char[texturePath.size() + 1];
+
+	texturePath.copy(cstr, texturePath.size() + 1);
+	cstr[texturePath.size()] = '\0';
+
+	textureID = loadPNG(cstr);
 }
+
+
 
 GameCharacter::~GameCharacter()
 {

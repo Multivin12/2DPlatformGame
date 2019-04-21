@@ -13,6 +13,7 @@
 #include "playerCharacter.h" // Header file for the player character 
 #include "Platform.h" // Header file for the platforms  
 #include "NPC.h" // Header file for the enemy characters
+#include "Spaceship.h" // Header file for the spaceship
 #include "MovingPlatform.h" // Header file for the moving platforms.
 #include <vector>
 #include <chrono>
@@ -26,8 +27,12 @@ bool keys[256];
 
 int numFrames = 0;
 
-bool displayTitlePage = true;
+//variables for storing which screens to display
+bool displayMenuScreen = true;
 bool displayInstructions = false;
+bool displayWin = false;
+bool displayDefeat = false;
+bool displayEnterName = false;
 
 //Variables for adjusting the viewport
 //Xdir and Ydir is the amount to move the objects by 
@@ -36,7 +41,9 @@ float Ydir = 0;
 
 //Object for handling the player character
 PlayerCharacter player;
-NPC enemy;
+Spaceship spaceship;
+//enemys xspeed, the colour, and the max distance to travel from its starting position
+NPC enemy(10.0f,"blue", 860.0f);
 vector<NPC*> enemys = { &enemy };
 
 //Object for handling the ground platform
@@ -66,6 +73,12 @@ GLuint startGameButtonIcon = 0;
 GLuint instructionsButtonIcon = 0;
 GLuint constantImage = 0;
 GLuint instructionsImage = 0;
+GLuint gameOver = 0;
+GLuint home = 0;
+GLuint quit = 0;
+GLuint youWin = 0;
+GLuint enterName = 0;
+GLuint pressEnter = 0;
 
 //Duration object to represent the time taken to complete the game
 Duration gameTime;
@@ -83,7 +96,7 @@ HGLRC		hRC = NULL;		// Permanent Rendering Context
 HWND		hWnd = NULL;		// Holds Our Window Handle
 HINSTANCE	hInstance;		// Holds The Instance Of The Application
 
-//Optional added stuff from template
+//Recording mouse input
 float mouse_x = 0;
 float mouse_y = 0;
 bool leftPressed = false;
@@ -104,7 +117,8 @@ void displayWorld();		//Method for displaying the game's world.
 void displayScore();		//Method for displaying the scoring system.
 void detectCollisions();	//Method for updating the collisions in the game.
 void displayTitle();
-
+void resetWorld();			//Method to reset the world should the user want to play again
+void isOnLeaderboard();		//Method for text
 
 
 
@@ -157,16 +171,19 @@ void display()
 
 	rescaleWindow();
 
-	if (displayTitlePage) {
+	if (displayMenuScreen || displayInstructions || displayWin || displayDefeat || displayEnterName) {
 		displayTitle();
 	}
 	else {
 		displayWorld();
 
 		//to update the time for the scoreboard
-		auto current_time = std::chrono::steady_clock::now();
-		currentSecondsElapsed = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
-		gameTime.convertFromSeconds(currentSecondsElapsed);
+		if (!spaceship.isCollidingPlayer) {
+			auto current_time = std::chrono::steady_clock::now();
+			currentSecondsElapsed = std::chrono::duration_cast<std::chrono::seconds>(current_time - start_time).count();
+			gameTime.convertFromSeconds(currentSecondsElapsed);
+		}
+		
 
 		displayScore();
 
@@ -176,9 +193,30 @@ void display()
 	glFlush();
 }
 
+void isOnLeaderboard() {
+
+}
+
+void resetWorld() {
+	player.resetCharacter();
+	spaceship.resetCharacter();
+
+	for (vector<NPC*>::iterator it = enemys.begin();
+		it != enemys.end(); it++) {
+
+		NPC * npc = *it;
+
+		npc->resetCharacter();
+	}
+}
+
 void displayWorld() {
 
 	float matrix[16];
+
+	if (player.YPla == 0) {
+		Ydir = 0;
+	}
 
 	//the background
 	glEnable(GL_TEXTURE_2D);
@@ -196,7 +234,6 @@ void displayWorld() {
 
 
 	//Character polygon
-	glColor3f(1.0, 1.0, 1.0);
 	glPushMatrix();
 		glTranslatef(player.XPla - Xdir, player.YPla - Ydir, 0.0);
 		player.addPointsandDraw(50.0, 120.0, 50.0, 240.0, 150.0, 240.0, 150.0, 120.0);
@@ -259,6 +296,15 @@ void displayWorld() {
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		enemy.createOBB(matrix);
 	glPopMatrix();
+
+	//the spaceship that marks the end of the game
+	glPushMatrix();
+		glTranslatef(-Xdir + spaceship.XPla, -Ydir + spaceship.YPla, 0.0);
+		spaceship.addPointsandDraw(1800, 120, 1800, 500, 2100, 500, 2100, 120);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		spaceship.createOBB(matrix);
+	glPopMatrix();
+
 }
 
 void displayScore() {
@@ -318,91 +364,129 @@ void displayScore() {
 
 void detectCollisions() {
 
-	//////////////////////////////////////////////////////////////////////////////////////////////////////
-	//player collisions
-	//Platform collisions
+	if(!spaceship.isCollidingPlayer){
+		//////////////////////////////////////////////////////////////////////////////////////////////////////
+		//player collisions
+		//Platform collisions
 
-	//This part is for testing which platforms are colliding with the player
-	bool isColliding = false;
+		//This part is for testing which platforms are colliding with the player
+		bool isColliding = false;
 
-	for (vector<Platform*>::iterator it = platforms.begin();
-		it != platforms.end(); it++) {
+		for (vector<Platform*>::iterator it = platforms.begin();
+			it != platforms.end(); it++) {
 
-		Platform * platform = *it;
+			Platform * platform = *it;
 
-		//For handling collisions
-		isColliding = player.boundingBox.SAT2D(platform->boundingBox);
+			//For handling collisions
+			isColliding = player.boundingBox.SAT2D(platform->boundingBox);
 
-		//if it's colliding with the ground then set the collision status to that object corresponding to that object
-		if (isColliding) {
-			player.areCollidingPlatform = true;
-			player.collisionStatuses.push_back(platform->typeOfCollision(player, dt));
+			//if it's colliding with the ground then set the collision status to that object corresponding to that object
+			if (isColliding) {
+				player.areCollidingPlatform = true;
+				player.collisionStatuses.push_back(platform->typeOfCollision(player, dt));
+			}
+		}
+
+		//so the player is not colliding with anything at all
+		if (player.collisionStatuses.empty()) {
+			player.areCollidingPlatform = false;
+			//so the player can't jump while in mid air
+			player.jumpPressed = true;
+		}
+
+		//NPC Collisions
+		//This part is for testing which platforms are colliding with the player
+		isColliding = false;
+
+		for (vector<NPC*>::iterator it = enemys.begin();
+			it != enemys.end(); it++) {
+
+			NPC * npc = *it;
+
+			//For handling collisions
+			isColliding = player.boundingBox.SAT2D(npc->boundingBox);
+
+			if (isColliding) {
+				npc->typeOfCollision(player, dt);
+			}
+		}
+
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+		//enemy collisions
+
+		//This part is for testing which platforms are colliding with the player
+		isColliding = false;
+
+		for (vector<Platform*>::iterator it = platforms.begin();
+			it != platforms.end(); it++) {
+
+			Platform * platform = *it;
+
+			//For handling collisions
+			isColliding = enemy.boundingBox.SAT2D(platform->boundingBox);
+
+			//if it's colliding with the ground then set the collision status to that object corresponding to that object
+			if (isColliding) {
+				enemy.areCollidingPlatform = true;
+				enemy.collisionStatuses.push_back(platform->typeOfCollision(enemy, dt));
+			}
+		}
+
+		//so the player is not colliding with anything at all
+		if (enemy.collisionStatuses.empty()) {
+			enemy.areCollidingPlatform = false;
+		}
+
+		//test if the player has reached the end of the game
+		spaceship.isCollidingPlayer = player.boundingBox.SAT2D(spaceship.boundingBox);
+		player.collidingSpaceship = player.boundingBox.SAT2D(spaceship.boundingBox);
+
+		if (player.collidingSpaceship) {
+			player.Yspeed = 2.0f;
+			spaceship.Yspeed = 2.0f;
+			spaceship.loadTexture("Sprites/spaceshipLiftOff.png");
 		}
 	}
-
-	//so the player is not colliding with anything at all
-	if (player.collisionStatuses.empty()) {
-		player.areCollidingPlatform = false;
-		//so the player can't jump while in mid air
-		player.jumpPressed = true;
+	else {
+		player.textureID = 0;
+	}
+	
+	if (player.livesLeft <= 0) {
+		displayDefeat = true;
 	}
 
-	//NPC Collisions
-	//This part is for testing which platforms are colliding with the player
-	isColliding = false;
+	//Test if the player has made it onto the leaderboard
+	if (spaceship.Yspeed > 200) {
 
-	for (vector<NPC*>::iterator it = enemys.begin();
-		it != enemys.end(); it++) {
-
-		NPC * npc = *it;
-
-		//For handling collisions
-		isColliding = player.boundingBox.SAT2D(npc->boundingBox);
-
-		if (isColliding) {
-			npc->typeOfCollision(player, dt);
+		if (isOnLeaderboard()) {
+			enterName = true;
 		}
-	}
-
-	///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-	//enemy collisions
-
-	//This part is for testing which platforms are colliding with the player
-	isColliding = false;
-
-	for (vector<Platform*>::iterator it = platforms.begin();
-		it != platforms.end(); it++) {
-
-		Platform * platform = *it;
-
-		//For handling collisions
-		isColliding = enemy.boundingBox.SAT2D(platform->boundingBox);
-
-		//if it's colliding with the ground then set the collision status to that object corresponding to that object
-		if (isColliding) {
-			enemy.areCollidingPlatform = true;
-			enemy.collisionStatuses.push_back(platform->typeOfCollision(enemy, dt));
+		else {
+			displayWin = true;
 		}
-	}
-
-	//so the player is not colliding with anything at all
-	if (enemy.collisionStatuses.empty()) {
-		enemy.areCollidingPlatform = false;
+		
 	}
 }
 
-//Method for displaying the title screen when the game first launches
+//Method for controlling the menu that appears throughout the game such as the start menu, instructions, game over screen
+//and completed game screen.
 void displayTitle() {
 
-	if (!displayInstructions) {
+	if (displayMenuScreen) {
+		numFrames = 0;
 		if (mouse_y > screenHeight / 2.0 && mouse_y < screenHeight*0.7) {
 			if (instructionsButtonIcon != constantImage) {
 				startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
 				instructionsButtonIcon = loadPNG("Sprites/background.png");
 			}
 			if (leftPressed) {
-				displayTitlePage = false;
+				//if these are all false then load the game
+				displayMenuScreen = false;
+				displayInstructions = false;
+				displayWin = false;
+				displayDefeat = false;
+				displayEnterName = false;
 				start_time = std::chrono::steady_clock::now();
 			}
 		}
@@ -412,7 +496,12 @@ void displayTitle() {
 				startGameButtonIcon = loadPNG("Sprites/background.png");
 			}
 			if (leftPressed) {
+				//just instructions true so load the instructions page
+				displayMenuScreen = false;
 				displayInstructions = true;
+				displayWin = false;
+				displayDefeat = false;
+				displayEnterName = false;
 			}
 		}
 		else {
@@ -422,13 +511,55 @@ void displayTitle() {
 			}
 		}
 	}
-	else {
+	else if (displayEnterName) {
+
+	}
+	else if (displayWin) {
+
+	}
+	else if (displayDefeat) {
+		numFrames = 0;
+		if (mouse_x > 0 && mouse_x < 300) {
+			if (instructionsButtonIcon != constantImage) {
+				startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
+				instructionsButtonIcon = loadPNG("Sprites/background.png");
+			}
+			if (leftPressed) {
+				resetWorld();
+				displayMenuScreen = true;
+				displayInstructions = false;
+				displayWin = false;
+				displayDefeat = false;
+				displayEnterName = false;
+			}
+		}
+		else if (mouse_x > 320 && mouse_x < screenWidth*2.0) {
+			if (startGameButtonIcon != constantImage) {
+				instructionsButtonIcon = loadPNG("Sprites/astronautStill.png");
+				startGameButtonIcon = loadPNG("Sprites/background.png");
+			}
+			if (leftPressed) {
+				exit(EXIT_SUCCESS);
+			}
+		}
+		else {
+			if (startGameButtonIcon != constantImage && instructionsButtonIcon != constantImage) {
+				instructionsButtonIcon = loadPNG("Sprites/background.png");
+				startGameButtonIcon = loadPNG("Sprites/background.png");
+			}
+		}
+	}
+	else if (displayInstructions) {
 		numFrames++;
 		if (numFrames > 100) {
 			if (leftPressed) {
+				displayMenuScreen = false;
 				displayInstructions = false;
-				displayTitlePage = false;
+				displayWin = false;
+				displayDefeat = false;
+				displayEnterName = false;
 				start_time = std::chrono::steady_clock::now();
+				numFrames = 0;
 			}
 		}
 	}
@@ -448,8 +579,9 @@ void displayTitle() {
 		glPopMatrix();
 	glDisable(GL_TEXTURE_2D);
 
-	if (!displayInstructions) {
-		//start buttons
+	//drawing the design for each screen
+	if (displayMenuScreen) {
+		//start button
 		glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, startGameButton);
 			glPushMatrix();
@@ -503,7 +635,7 @@ void displayTitle() {
 			glPopMatrix();
 		glDisable(GL_TEXTURE_2D);
 	}
-	else {
+	else if (displayInstructions) {
 		//the background
 		glEnable(GL_TEXTURE_2D);
 			glBindTexture(GL_TEXTURE_2D, instructionsImage);
@@ -518,14 +650,107 @@ void displayTitle() {
 			glPopMatrix();
 		glDisable(GL_TEXTURE_2D);
 	}
+	else if (displayDefeat) {
+		//display the game over screen
+		//game over title
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, gameOver);
+			glPushMatrix();
+				glTranslatef(330, screenHeight * 2-250, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(screenWidth, 0);
+					glTexCoord2f(1, 1); glVertex2f(screenWidth, (screenHeight*2.0) / 8.0);
+					glTexCoord2f(0, 1); glVertex2f(0, (screenHeight*2.0) / 8.0);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		//home button
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, home);
+			glPushMatrix();
+				glTranslatef(150, 100, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(screenWidth*0.5, 0);
+					glTexCoord2f(1, 1); glVertex2f(screenWidth*0.5, (screenHeight) / 8.0);
+					glTexCoord2f(0, 1); glVertex2f(0, (screenHeight) / 8.0);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, startGameButtonIcon);
+			glPushMatrix();
+				glTranslatef(50, 75, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(80, 0);
+					glTexCoord2f(1, 1); glVertex2f(80, 120);
+					glTexCoord2f(0, 1); glVertex2f(0, 120);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		//quit button
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, quit);
+			glPushMatrix();
+				glTranslatef(800, 100, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(screenWidth*0.5, 0);
+					glTexCoord2f(1, 1); glVertex2f(screenWidth*0.5, (screenHeight) / 8.0);
+					glTexCoord2f(0, 1); glVertex2f(0, (screenHeight) / 8.0);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, instructionsButtonIcon);
+			glPushMatrix();
+				glTranslatef(700, 75, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(80, 0);
+					glTexCoord2f(1, 1); glVertex2f(80, 120);
+					glTexCoord2f(0, 1); glVertex2f(0, 120);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+	}
+	else if (displayWin) {
+
+	}
+	else if (displayEnterName) {
+		//display the win screen
+		//display the game over screen
+		//you win title
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, enterName);
+			glPushMatrix();
+				glTranslatef(330, screenHeight * 2 - 250, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(screenWidth, 0);
+					glTexCoord2f(1, 1); glVertex2f(screenWidth, (screenHeight*2.0) / 8.0);
+					glTexCoord2f(0, 1); glVertex2f(0, (screenHeight*2.0) / 8.0);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+	}
 }
 
 
 
 void reshape(int width, int height)		// Resize the OpenGL window
 {
-	Xdir = (screenWidth / width)*player.XPla- Xdir;					//Change the X and Y Position of the viewport depending on 
-	Ydir = (screenHeight / height)*Ydir;				//the change of the viewport
+	if (height != 0 || width != 0) {
+		Xdir = (screenWidth / width)*player.XPla - Xdir;	//Change the X and Y Position of the viewport depending on 
+		Ydir = (screenHeight / height)*Ydir;				//the change of the viewport
+	}
+	
 
 	screenWidth=width; screenHeight = height;           // to ensure the mouse coordinates match 
 														// we will use these values to set the coordinate system
@@ -614,10 +839,17 @@ void init()
 	backgroundTitle = loadPNG("Sprites/Ground/ground5.png");
 	constantImage = loadPNG("Sprites/background.png");
 	instructionsImage = loadPNG("Sprites/instructionsPage.png");
+	gameOver = loadPNG("Sprites/gameOver.png");
+	youWin = loadPNG("Sprites/youWin.png");
+	home = loadPNG("Sprites/home.png");
+	quit = loadPNG("Sprites/quit.png");
+	enterName = loadPNG("Sprites/enterName.png");
+	pressEnter = loadPNG("Sprites/pressEnter.png");
 
 	player.loadTexture("Sprites/astronautStill.png");
 	enemy.loadTexture("Sprites/alienSprites/alien_predator_mask/predatormask__0000_idle_1.png");
 	ground.loadTexture("Sprites/ground2.png");
+	spaceship.loadTexture("Sprites/spaceshipStill.png");
 
 	plat1.loadTexture("Sprites/platform3by2.png");
 	plat2.loadTexture("Sprites/platform3by2.png");
@@ -627,7 +859,7 @@ void init()
 
 void processKeys()
 {
-	if (!displayTitlePage) {
+	if ((!displayMenuScreen || !displayInstructions || !displayWin || !displayDefeat || !displayEnterName) && !spaceship.isCollidingPlayer) {
 		if (keys[VK_LEFT])
 		{
 			player.leftPressed = true;
@@ -686,8 +918,12 @@ void TimeSimulation() {
 void update()
 {
 	plat4.updatePlatformMovement(dt);
+
 	player.updatePlayerMovement(dt);
+
 	enemy.updatePlayerMovement(dt);
+
+	spaceship.updatePlayerMovement(dt);
 }
 /**************** END OPENGL FUNCTIONS *************************/
 

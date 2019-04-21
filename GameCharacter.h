@@ -7,6 +7,7 @@
 #include <gl\GL.h>
 #include <gl\GLu.h>
 #include <iostream>
+#include <cstring>
 
 
 using namespace std;
@@ -33,6 +34,7 @@ public:
 	double oldYspeed = 0.0f;
 
 	bool flash = false;
+	bool collidingSpaceship = false;
 
 	//variable for recording whether the character has collided with a platform or not
 	bool areCollidingPlatform = true;
@@ -42,11 +44,12 @@ public:
 	std::vector<std::string> collisionStatuses = {};
 
 	GameCharacter();
-	void loadTexture(char* texturePath);
+	void loadTexture(string texturePath);
 	GLuint loadPNG(char* name);
 	//First 8 coordinates are for the polygon
 	void addPointsandDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y);
 	virtual void updatePlayerMovement(double dt) = 0;
+	virtual void resetCharacter() = 0;
 	void createOBB(float matrix[16]);
 	void drawOBB(void);
 	~GameCharacter();

@@ -93,7 +93,7 @@ std::string Platform::typeOfCollision(GameCharacter& p,double dt) {
 	}
 		
 	//Test if the min of a platform is greater than the player's minimum minus a certain threshold
-	if (platform.getMinY() >= player.getMaxY() - 96.0*dt) {
+	if (platform.getMinY() >= player.getMaxY() - 48.0*dt) {
 
 		double difference = player.getMaxY() - platform.getMinY();
 		p.YPla -= difference;

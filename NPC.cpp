@@ -8,10 +8,21 @@
 /*
  * Constructor for this class, builds the polygon by invoking the GameCharacter() super class.
 */
-NPC::NPC():GameCharacter()
+NPC::NPC(float Xspeed, string colour, float distanceTravelled):GameCharacter()
 {
-	Xspeed = 15.0f;
-	oldXspeed = 15.0f;
+	this->Xspeed = Xspeed;
+	oldXspeed = Xspeed;
+	this->colour = colour;
+	this->distanceTravelled = distanceTravelled;
+
+	if (this->colour == "blue") {
+		startingLives = 1;
+	}
+	else if (this->colour == "armour") {
+		startingLives = 2;
+	}
+
+	livesLeft = startingLives;
 }
 
 /*
@@ -28,7 +39,10 @@ void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
 			if (npc.getMaxY() <= player.getMinY() + 128.0*dt) {
 				p.Yspeed = -p.Yspeed;
 				textureNumber = 0;
-				isDead = true;
+				livesLeft--;
+				if (livesLeft == 0) {
+					isDead = true;
+				}
 			}
 			//bottom side
 			else if (npc.getMinY() >= player.getMaxY() - 48.0*dt) {
@@ -72,12 +86,12 @@ void NPC::updatePlayerMovement(double dt) {
 	//equation for updating displacement
 		XPla += Xspeed * dt;
 
-		if (XPla > 860.0f || XPla < 0.0f) {
+		if (XPla > distanceTravelled || XPla < 0.0f) {
 			if (XPla < 0.0f) {
 				XPla = 0.0f;
 			}
-			if (XPla > 860.0f) {
-				XPla = 860.0f;
+			if (XPla > distanceTravelled) {
+				XPla = distanceTravelled;
 			}
 			oldXspeed = -oldXspeed;
 			Xspeed = -Xspeed;
@@ -132,20 +146,20 @@ void NPC::updatePlayerMovement(double dt) {
 		}
 
 		//now update the texture
-		if (numFrames % 30 == 0) {
+		if (numFrames % ((int) round(600.0f/Xspeed)) == 0) {
 			textureNumber++;
 			switch (textureNumber % 4) {
 
-			case 0: loadTexture("Sprites/alien/blue/blue_walk1.png");
+			case 0: loadTexture("Sprites/alien/" + colour + "/" + colour + "_walk1.png");
 				break;
 
-			case 1: loadTexture("Sprites/alien/blue/blue_walk2.png");
+			case 1: loadTexture("Sprites/alien/" + colour + "/" + colour + "_walk2.png");
 				break;
 
-			case 2: loadTexture("Sprites/alien/blue/blue_walk3.png");
+			case 2: loadTexture("Sprites/alien/" + colour + "/" + colour + "_walk3.png");
 				break;
 
-			case 3: loadTexture("Sprites/alien/blue/blue_walk4.png");
+			case 3: loadTexture("Sprites/alien/" + colour + "/" + colour + "_walk4.png");
 				break;
 			}
 		}
@@ -163,34 +177,34 @@ void NPC::updatePlayerMovement(double dt) {
 			textureNumber++;
 			switch (textureNumber % 10) {
 
-			case 0: loadTexture("Sprites/alien/blue/blue_dead1.png");
+			case 0: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead1.png");
 				break;
 
-			case 1: loadTexture("Sprites/alien/blue/blue_dead2.png");
+			case 1: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead2.png");
 				break;
 
-			case 2: loadTexture("Sprites/alien/blue/blue_dead3.png");
+			case 2: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead3.png");
 				break;
 
-			case 3: loadTexture("Sprites/alien/blue/blue_dead4.png");
+			case 3: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead4.png");
 				break;
 
-			case 4: loadTexture("Sprites/alien/blue/blue_dead5.png");
+			case 4: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead5.png");
 				break;
 
-			case 5: loadTexture("Sprites/alien/blue/blue_dead6.png");
+			case 5: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead6.png");
 				break;
 
-			case 6: loadTexture("Sprites/alien/blue/blue_dead7.png");
+			case 6: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead7.png");
 				break;
 
-			case 7: loadTexture("Sprites/alien/blue/blue_dead8.png");
+			case 7: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead8.png");
 				break;
 
-			case 8: loadTexture("Sprites/alien/blue/blue_dead9.png");
+			case 8: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead9.png");
 				break;
 
-			case 9: loadTexture("Sprites/alien/blue/blue_dead10.png");
+			case 9: loadTexture("Sprites/alien/" + colour + "/" + colour + "_dead10.png");
 				deleteObj = true;
 				break;
 			}
@@ -199,6 +213,28 @@ void NPC::updatePlayerMovement(double dt) {
 
 	collisionStatuses.clear();
 	numFrames++;
+}
+
+void NPC::resetCharacter() {
+	YPla = 0;
+	YspeedInc = 7.5f;
+
+	XPla = 0.0;
+	XspeedInc = 1.5f;
+
+	textureDirection = true;
+	numFrames = 0;
+	textureNumber = 0;
+
+	flash = false;
+	collidingSpaceship = false;
+	areCollidingPlatform = true;
+
+	isDead = false;
+	deleteObj = false;
+
+	livesLeft = startingLives;
+
 }
 
 NPC::~NPC()

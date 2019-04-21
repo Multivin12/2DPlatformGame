@@ -19,6 +19,7 @@
     <ClCompile Include="Platform.cpp" />
     <ClCompile Include="platformGameMain.cpp" />
     <ClCompile Include="playerCharacter.cpp" />
+    <ClCompile Include="Spaceship.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Duration.h" />
@@ -28,6 +29,7 @@
     <ClInclude Include="OBB.h" />
     <ClInclude Include="Platform.h" />
     <ClInclude Include="playerCharacter.h" />
+    <ClInclude Include="Spaceship.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{797EB91C-0B55-4A4C-A841-E660F49877DD}</ProjectGuid>
