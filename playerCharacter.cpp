@@ -129,17 +129,19 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 		}
 
 		if (coolDown) {
-			coolDownTime++;
+
+			
+			coolDownTime += dt;
 			//to determine when the game charater should flash
-			if (100 < coolDownTime && coolDownTime < 150 ||
-				200 < coolDownTime && coolDownTime < 250 ||
-				300 < coolDownTime && coolDownTime < 350 ||
-				400 < coolDownTime && coolDownTime < 450 ||
-				500 < coolDownTime && coolDownTime < 550 ||
-				600 < coolDownTime && coolDownTime < 650 ||
-				700 < coolDownTime && coolDownTime < 750 ||
-				800 < coolDownTime && coolDownTime < 850 ||
-				900 < coolDownTime && coolDownTime < 950) {
+			if (10 < coolDownTime && coolDownTime < 15 ||
+				20 < coolDownTime && coolDownTime < 25 ||
+				30 < coolDownTime && coolDownTime < 35 ||
+				40 < coolDownTime && coolDownTime < 45 ||
+				50 < coolDownTime && coolDownTime < 55 ||
+				60 < coolDownTime && coolDownTime < 65 ||
+				70 < coolDownTime && coolDownTime < 75 ||
+				80 < coolDownTime && coolDownTime < 85 ||
+				90 < coolDownTime && coolDownTime < 95) {
 				flash = true;
 			}
 			else {
@@ -149,7 +151,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 				glColor3f(0, 0, 0);
 			}
 
-			if (coolDownTime == 1000) {
+			if (coolDownTime == 100) {
 				coolDown = false;
 				coolDownTime = 0;
 			}
@@ -246,6 +248,8 @@ void PlayerCharacter::resetCharacter() {
 
 	coolDown = false;
 	coolDownTime = 0;
+
+	loadTexture("Sprites/astronautStill.png");
 }
 
 

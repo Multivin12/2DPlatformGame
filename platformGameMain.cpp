@@ -35,8 +35,8 @@ bool displayInstructions = false;
 bool displayWin = false;
 bool displayDefeat = false;
 bool displayEnterName = false;
-bool instructionsIconLoaded = true;
-bool startGameIconLoaded = true;
+bool instructionsIconLoaded = false;
+bool startGameIconLoaded = false;
 string typedName = "";
 
 //for storing the loaded in file data
@@ -67,7 +67,7 @@ vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.000003; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.0000075; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
 										//0.000008 recommended for PC, 0.000003 for my laptop.
 
@@ -463,6 +463,8 @@ void detectCollisions() {
 	
 	if (player.livesLeft <= 0) {
 		displayDefeat = true;
+		startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
+		instructionsButtonIcon = loadPNG("Sprites/background.png");
 	}
 
 	//Test if the player has made it onto the leaderboard
@@ -615,10 +617,55 @@ void displayTitle() {
 		}
 	}
 	else if (displayEnterName) {
-		cout << typedName << endl;
+
 	}
 	else if (displayWin) {
+		cout << startGameIconLoaded << endl;
+		//for displaying the buttons and titles
+		numFrames = 0;
+		if (mouse_x > 0 && mouse_x < 300)
+		{
+			startGameIconLoaded = false;
+			if (!instructionsIconLoaded) {
+				startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
+				instructionsButtonIcon = loadPNG("Sprites/background.png");
+				instructionsIconLoaded = true;
+			}
+			if (leftPressed) {
+				resetWorld();
+				displayMenuScreen = true;
+				displayInstructions = false;
+				displayWin = false;
+				displayDefeat = false;
+				displayEnterName = false;
+			}
+		}
+		else if (mouse_x > 320 && mouse_x < screenWidth*2.0) {
 
+			instructionsIconLoaded = false;
+
+			if (!startGameIconLoaded) {
+				instructionsButtonIcon = loadPNG("Sprites/astronautStill.png");
+				startGameButtonIcon = loadPNG("Sprites/background.png");
+				startGameIconLoaded = true;
+			}
+			if (leftPressed) {
+				exit(EXIT_SUCCESS);
+			}
+		}
+		else {
+
+			if (startGameIconLoaded) {
+				startGameButtonIcon = loadPNG("Sprites/background.png");
+				startGameIconLoaded = false;
+			}
+
+			if (instructionsIconLoaded) {
+				instructionsButtonIcon = loadPNG("Sprites/background.png");
+				instructionsIconLoaded = false;
+			}
+
+		}
 	}
 	else if (displayDefeat) {
 		numFrames = 0;
@@ -668,7 +715,7 @@ void displayTitle() {
 	}
 	else if (displayInstructions) {
 		numFrames++;
-		if (numFrames > 200) {
+		if (numFrames > 200000*dt) {
 			if (leftPressed) {
 				displayMenuScreen = false;
 				displayInstructions = false;
@@ -838,7 +885,74 @@ void displayTitle() {
 		glDisable(GL_TEXTURE_2D);
 	}
 	else if (displayWin) {
+		//display the you win screen
+		//you win title
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, youWin);
+			glPushMatrix();
+				glTranslatef(330, screenHeight * 2 - 250, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(screenWidth, 0);
+					glTexCoord2f(1, 1); glVertex2f(screenWidth, (screenHeight*2.0) / 8.0);
+					glTexCoord2f(0, 1); glVertex2f(0, (screenHeight*2.0) / 8.0);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 
+		//home button
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, home);
+			glPushMatrix();
+				glTranslatef(150, 100, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(screenWidth*0.5, 0);
+					glTexCoord2f(1, 1); glVertex2f(screenWidth*0.5, (screenHeight) / 8.0);
+					glTexCoord2f(0, 1); glVertex2f(0, (screenHeight) / 8.0);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, startGameButtonIcon);
+			glPushMatrix();
+				glTranslatef(50, 75, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(80, 0);
+					glTexCoord2f(1, 1); glVertex2f(80, 120);
+					glTexCoord2f(0, 1); glVertex2f(0, 120);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		//quit button
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, quit);
+			glPushMatrix();
+				glTranslatef(800, 100, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(screenWidth*0.5, 0);
+					glTexCoord2f(1, 1); glVertex2f(screenWidth*0.5, (screenHeight) / 8.0);
+					glTexCoord2f(0, 1); glVertex2f(0, (screenHeight) / 8.0);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, instructionsButtonIcon);
+			glPushMatrix();
+				glTranslatef(700, 75, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(80, 0);
+					glTexCoord2f(1, 1); glVertex2f(80, 120);
+					glTexCoord2f(0, 1); glVertex2f(0, 120);
+				glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
 	}
 	else if (displayEnterName) {
 		//display the win screen
@@ -856,6 +970,26 @@ void displayTitle() {
 				glEnd();
 			glPopMatrix();
 		glDisable(GL_TEXTURE_2D);
+
+		//continue button
+		glEnable(GL_TEXTURE_2D);
+			glBindTexture(GL_TEXTURE_2D, pressEnter);
+			glPushMatrix();
+				glTranslatef(100, 100, 0);
+				glBegin(GL_QUADS);
+					glTexCoord2f(0, 0); glVertex2f(0, 0);
+					glTexCoord2f(1, 0); glVertex2f(1080, 0);
+					glTexCoord2f(1, 1); glVertex2f(1080, (screenHeight) / 8.0);
+					glTexCoord2f(0, 1); glVertex2f(0, (screenHeight) / 8.0);
+			glEnd();
+			glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+
+		//display the typed name
+		BuildFont(100, 50);
+		glRasterPos2f(250, screenHeight);
+		glColor3f(1.0, 1.0, 1.0);
+		glPrint(typedName);
 	}
 }
 
@@ -961,6 +1095,8 @@ void init()
 	quit = loadPNG("Sprites/quit.png");
 	enterName = loadPNG("Sprites/enterName.png");
 	pressEnter = loadPNG("Sprites/pressEnter.png");
+	startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
+	instructionsButtonIcon = loadPNG("Sprites/background.png");
 
 	player.loadTexture("Sprites/astronautStill.png");
 	enemy.loadTexture("Sprites/alienSprites/alien_predator_mask/predatormask__0000_idle_1.png");
@@ -1011,114 +1147,150 @@ void processKeys()
 		}
 	}
 
-	if (displayEnterName) {
-		//letter A on the keyboard
-		if (keys[0x41]) {
-			typedName.append("a");
-		}
+	if (displayEnterName && (typedName.size() < 7)) {
+		numFrames++;
+		if (numFrames > 5* dt) {
+			//letter A on the keyboard
+			if (keys[0x41]) {
+				typedName.append("a");
+				numFrames = 0;
+			}
 
-		if (keys[0x42]) {
-			typedName += "b";
-		}
+			if (keys[0x42]) {
+				typedName.append("b");
+				numFrames = 0;
+			}
 
-		if (keys[0x43]) {
-			typedName += "c";
-		}
+			if (keys[0x43]) {
+				typedName.append("c");
+				numFrames = 0;
+			}
 
-		if (keys[0x44]) {
-			typedName += "d";
-		}
+			if (keys[0x44]) {
+				typedName.append("d");
+				numFrames = 0;
+			}
 
-		if (keys[0x45]) {
-			typedName += "e";
-		}
+			if (keys[0x45]) {
+				typedName.append("e");
+				numFrames = 0;
+			}
 
-		if (keys[0x46]) {
-			typedName += "f";
-		}
+			if (keys[0x46]) {
+				typedName.append("f");
+				numFrames = 0;
+			}
 
-		if (keys[0x47]) {
-			typedName += "g";
-		}
+			if (keys[0x47]) {
+				typedName.append("g");
+				numFrames = 0;
+			}
 
-		if (keys[0x48]) {
-			typedName += "h";
-		}
+			if (keys[0x48]) {
+				typedName.append("h");
+				numFrames = 0;
+			}
 
-		if (keys[0x49]) {
-			typedName += "i";
-		}
+			if (keys[0x49]) {
+				typedName.append("i");
+				numFrames = 0;
+			}
 
-		if (keys[0x4A]) {
-			typedName += "j";
-		}
+			if (keys[0x4A]) {
+				typedName.append("j");
+				numFrames = 0;
+			}
 
-		if (keys[0x4B]) {
-			typedName += "k";
-		}
+			if (keys[0x4B]) {
+				typedName.append("k");
+				numFrames = 0;
+			}
 
-		if (keys[0x4C]) {
-			typedName += "l";
-		}
+			if (keys[0x4C]) {
+				typedName.append("l");
+				numFrames = 0;
+			}
 
-		if (keys[0x4D]) {
-			typedName += "m";
-		}
+			if (keys[0x4D]) {
+				typedName.append("m");
+				numFrames = 0;
+			}
 
-		if (keys[0x4E]) {
-			typedName += "n";
-		}
+			if (keys[0x4E]) {
+				typedName.append("n");
+				numFrames = 0;
+			}
 
-		if (keys[0x4F]) {
-			typedName += "o";
-		}
+			if (keys[0x4F]) {
+				typedName.append("o");
+				numFrames = 0;
+			}
 
-		if (keys[0x50]) {
-			typedName += "p";
-		}
+			if (keys[0x50]) {
+				typedName.append("p");
+				numFrames = 0;
+			}
 
-		if (keys[0x51]) {
-			typedName += "q";
-		}
+			if (keys[0x51]) {
+				typedName.append("q");
+				numFrames = 0;
+			}
 
-		if (keys[0x52]) {
-			typedName += "r";
-		}
+			if (keys[0x52]) {
+				typedName.append("r");
+				numFrames = 0;
+			}
 
-		if (keys[0x53]) {
-			typedName += "s";
-		}
+			if (keys[0x53]) {
+				typedName.append("s");
+				numFrames = 0;
+			}
 
-		if (keys[0x54]) {
-			typedName += "t";
-		}
+			if (keys[0x54]) {
+				typedName.append("t");
+				numFrames = 0;
+			}
 
-		if (keys[0x55]) {
-			typedName += "u";
-		}
+			if (keys[0x55]) {
+				typedName.append("u");
+				numFrames = 0;
+			}
 
-		if (keys[0x56]) {
-			typedName += "v";
-		}
+			if (keys[0x56]) {
+				typedName.append("v");
+				numFrames = 0;
+			}
 
-		if (keys[0x57]) {
-			typedName += "w";
-		}
+			if (keys[0x57]) {
+				typedName.append("w");
+				numFrames = 0;
+			}
 
-		if (keys[0x58]) {
-			typedName += "x";
-		}
+			if (keys[0x58]) {
+				typedName.append("x");
+				numFrames = 0;
+			}
 
-		if (keys[0x59]) {
-			typedName += "y";
-		}
+			if (keys[0x59]) {
+				typedName.append("y");
+				numFrames = 0;
+			}
 
-		if (keys[0x5A]) {
-			typedName += "z";
+			if (keys[0x5A]) {
+				typedName.append("z");
+				numFrames = 0;
+			}
 		}
-
 	}
 	
+	if (displayEnterName) {
+		if (keys[VK_RETURN]) {
+			displayWin = true;
+			displayEnterName = false;
+			startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
+			instructionsButtonIcon = loadPNG("Sprites/background.png");
+		}
+	}
 }
 
 void TimeSimulation() {
