@@ -4,8 +4,10 @@
 
 #include <windows.h>		// Header file for Windows
 #include <iostream>
+#include <fstream>
 #include <string>			// used for strings
 #include <sstream>			// used for streaming text
+#include <stdio.h>	
 #include "Image_Loading/nvImage.h"
 #include <gl/GL.h>
 #include <gl/GLU.h>
@@ -33,6 +35,14 @@ bool displayInstructions = false;
 bool displayWin = false;
 bool displayDefeat = false;
 bool displayEnterName = false;
+bool instructionsIconLoaded = true;
+bool startGameIconLoaded = true;
+string typedName = "";
+
+//for storing the loaded in file data
+vector<string> names = {};
+vector<Duration*> times = {};
+int indexToAdd;
 
 //Variables for adjusting the viewport
 //Xdir and Ydir is the amount to move the objects by 
@@ -71,7 +81,6 @@ GLuint startGameButton = 0;
 GLuint instructionsButton = 0;
 GLuint startGameButtonIcon = 0;
 GLuint instructionsButtonIcon = 0;
-GLuint constantImage = 0;
 GLuint instructionsImage = 0;
 GLuint gameOver = 0;
 GLuint home = 0;
@@ -459,10 +468,92 @@ void detectCollisions() {
 	//Test if the player has made it onto the leaderboard
 	if (spaceship.Yspeed > 200) {
 
-		if (isOnLeaderboard()) {
-			enterName = true;
+		ifstream inFile("leaderboard.csv");
+
+		string line;
+
+		//gather the time from the leaderboard file to see if the person has made it
+		while (inFile >> line) {
+			stringstream check(line);
+
+			string intermediate;
+
+			vector<string> tokens;
+
+			while (getline(check, intermediate, ',')) {
+				tokens.push_back(intermediate);	
+			}
+
+			for (int i = 0; i < tokens.size(); i++) {
+				//its a name
+				if (i % 2 == 0) {
+					names.push_back(tokens[i]);
+				}
+				else {
+					//otherwise its a time
+					string currentTime = tokens[i];
+
+					Duration * timeToAdd = new Duration();
+
+					stringstream check2(currentTime);
+
+					string intermediate2;
+
+					vector<string> timeTokens;
+
+					while (getline(check2, intermediate2, ':')) {
+						timeTokens.push_back(intermediate2);
+					}
+
+					int newHours = stoi(timeTokens[0]);
+
+					int newMinutes = stoi(timeTokens[1]);
+
+					int newSeconds = stoi(timeTokens[2]);
+
+					timeToAdd->hours = newHours;
+
+					timeToAdd->minutes = newMinutes;
+
+					timeToAdd->seconds = newSeconds;
+
+					times.push_back(timeToAdd);
+				}
+			}
+				
 		}
-		else {
+
+		//then test if the player has made it onto the leaderboard
+
+		for (int i = 0; i < times.size(); i++) {
+
+			Duration timeToTest = *times[i];
+
+			if (gameTime.hours < timeToTest.hours) {
+				displayEnterName = true;
+				indexToAdd = i;
+				break;
+			}
+			else {
+				if (gameTime.hours == timeToTest.hours) {
+					if (gameTime.minutes < timeToTest.minutes) {
+						displayEnterName = true;
+						indexToAdd = i;
+						break;
+					}
+					else {
+						if (gameTime.minutes == timeToTest.minutes) {
+							if (gameTime.seconds < timeToTest.seconds) {
+								displayEnterName = true;
+								indexToAdd = i;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		if (!displayEnterName) {
 			displayWin = true;
 		}
 		
@@ -476,9 +567,12 @@ void displayTitle() {
 	if (displayMenuScreen) {
 		numFrames = 0;
 		if (mouse_y > screenHeight / 2.0 && mouse_y < screenHeight*0.7) {
-			if (instructionsButtonIcon != constantImage) {
+			instructionsIconLoaded = false;
+
+			if (!startGameIconLoaded) {
 				startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
 				instructionsButtonIcon = loadPNG("Sprites/background.png");
+				startGameIconLoaded = true;
 			}
 			if (leftPressed) {
 				//if these are all false then load the game
@@ -491,9 +585,12 @@ void displayTitle() {
 			}
 		}
 		else if (mouse_y < screenHeight / 2.0 && mouse_y > screenHeight*0.3) {
-			if (startGameButtonIcon != constantImage) {
+			startGameIconLoaded = false;
+
+			if (!instructionsIconLoaded) {
 				instructionsButtonIcon = loadPNG("Sprites/astronautStill.png");
 				startGameButtonIcon = loadPNG("Sprites/background.png");
+				instructionsIconLoaded = true;
 			}
 			if (leftPressed) {
 				//just instructions true so load the instructions page
@@ -505,24 +602,33 @@ void displayTitle() {
 			}
 		}
 		else {
-			if (startGameButtonIcon != constantImage && instructionsButtonIcon != constantImage) {
-				instructionsButtonIcon = loadPNG("Sprites/background.png");
+
+			if (startGameIconLoaded) {
 				startGameButtonIcon = loadPNG("Sprites/background.png");
+				startGameIconLoaded = false;
+			}
+			
+			if (instructionsIconLoaded) {
+				instructionsButtonIcon = loadPNG("Sprites/background.png");
+				instructionsIconLoaded = false;
 			}
 		}
 	}
 	else if (displayEnterName) {
-
+		cout << typedName << endl;
 	}
 	else if (displayWin) {
 
 	}
 	else if (displayDefeat) {
 		numFrames = 0;
-		if (mouse_x > 0 && mouse_x < 300) {
-			if (instructionsButtonIcon != constantImage) {
+		if (mouse_x > 0 && mouse_x < 300) 
+		{
+			startGameIconLoaded = false;
+			if (!instructionsIconLoaded) {
 				startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
 				instructionsButtonIcon = loadPNG("Sprites/background.png");
+				instructionsIconLoaded = true;
 			}
 			if (leftPressed) {
 				resetWorld();
@@ -534,24 +640,35 @@ void displayTitle() {
 			}
 		}
 		else if (mouse_x > 320 && mouse_x < screenWidth*2.0) {
-			if (startGameButtonIcon != constantImage) {
+
+			instructionsIconLoaded = false;
+
+			if (!startGameIconLoaded) {
 				instructionsButtonIcon = loadPNG("Sprites/astronautStill.png");
 				startGameButtonIcon = loadPNG("Sprites/background.png");
+				startGameIconLoaded = true;
 			}
 			if (leftPressed) {
 				exit(EXIT_SUCCESS);
 			}
 		}
 		else {
-			if (startGameButtonIcon != constantImage && instructionsButtonIcon != constantImage) {
-				instructionsButtonIcon = loadPNG("Sprites/background.png");
+
+			if (startGameIconLoaded) {
 				startGameButtonIcon = loadPNG("Sprites/background.png");
+				startGameIconLoaded = false;
 			}
+
+			if (instructionsIconLoaded) {
+				instructionsButtonIcon = loadPNG("Sprites/background.png");
+				instructionsIconLoaded = false;
+			}
+
 		}
 	}
 	else if (displayInstructions) {
 		numFrames++;
-		if (numFrames > 100) {
+		if (numFrames > 200) {
 			if (leftPressed) {
 				displayMenuScreen = false;
 				displayInstructions = false;
@@ -837,7 +954,6 @@ void init()
 	startGameButton = loadPNG("Sprites/startGame.png");
 	instructionsButton = loadPNG("Sprites/instructions.png");
 	backgroundTitle = loadPNG("Sprites/Ground/ground5.png");
-	constantImage = loadPNG("Sprites/background.png");
 	instructionsImage = loadPNG("Sprites/instructionsPage.png");
 	gameOver = loadPNG("Sprites/gameOver.png");
 	youWin = loadPNG("Sprites/youWin.png");
@@ -893,6 +1009,114 @@ void processKeys()
 				player.jumpCounter = 0;
 			}
 		}
+	}
+
+	if (displayEnterName) {
+		//letter A on the keyboard
+		if (keys[0x41]) {
+			typedName.append("a");
+		}
+
+		if (keys[0x42]) {
+			typedName += "b";
+		}
+
+		if (keys[0x43]) {
+			typedName += "c";
+		}
+
+		if (keys[0x44]) {
+			typedName += "d";
+		}
+
+		if (keys[0x45]) {
+			typedName += "e";
+		}
+
+		if (keys[0x46]) {
+			typedName += "f";
+		}
+
+		if (keys[0x47]) {
+			typedName += "g";
+		}
+
+		if (keys[0x48]) {
+			typedName += "h";
+		}
+
+		if (keys[0x49]) {
+			typedName += "i";
+		}
+
+		if (keys[0x4A]) {
+			typedName += "j";
+		}
+
+		if (keys[0x4B]) {
+			typedName += "k";
+		}
+
+		if (keys[0x4C]) {
+			typedName += "l";
+		}
+
+		if (keys[0x4D]) {
+			typedName += "m";
+		}
+
+		if (keys[0x4E]) {
+			typedName += "n";
+		}
+
+		if (keys[0x4F]) {
+			typedName += "o";
+		}
+
+		if (keys[0x50]) {
+			typedName += "p";
+		}
+
+		if (keys[0x51]) {
+			typedName += "q";
+		}
+
+		if (keys[0x52]) {
+			typedName += "r";
+		}
+
+		if (keys[0x53]) {
+			typedName += "s";
+		}
+
+		if (keys[0x54]) {
+			typedName += "t";
+		}
+
+		if (keys[0x55]) {
+			typedName += "u";
+		}
+
+		if (keys[0x56]) {
+			typedName += "v";
+		}
+
+		if (keys[0x57]) {
+			typedName += "w";
+		}
+
+		if (keys[0x58]) {
+			typedName += "x";
+		}
+
+		if (keys[0x59]) {
+			typedName += "y";
+		}
+
+		if (keys[0x5A]) {
+			typedName += "z";
+		}
+
 	}
 	
 }
