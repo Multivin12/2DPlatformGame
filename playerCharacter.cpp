@@ -151,7 +151,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 				glColor3f(0, 0, 0);
 			}
 
-			if (coolDownTime == 100) {
+			if (coolDownTime >= 100) {
 				coolDown = false;
 				coolDownTime = 0;
 			}
