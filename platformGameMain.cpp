@@ -67,11 +67,10 @@ vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.0000075; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.000003; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
 										//0.000008 recommended for PC, 0.000003 for my laptop.
-
-
+double counter = 0;
 //Textures
 GLuint background = 0;
 GLuint livesIcon = 0;
@@ -218,46 +217,6 @@ void resetWorld() {
 		npc->resetCharacter();
 	}
 	BuildFont((int)round((double)screenHeight / 30.0), (int)round((double)screenHeight / 60.0));
-
-	//Save the scoreboard and clear the arrays
-	ofstream file("leaderboard.csv");
-
-	if (file.is_open()) {
-		for (int i = 0; i < names.size(); i++) {
-			string hoursString;
-			string minutesString;
-			string secondsString;
-			stringstream ss;
-
-			ss << times[i]->hours;
-
-			hoursString = ss.str();
-
-			stringstream ss1;
-			ss1 << times[i]->minutes;
-
-			minutesString = ss1.str();
-
-			stringstream ss2;
-			ss2 << times[i]->seconds;
-
-			secondsString = ss2.str();
-
-			if (times[i]->hours < 10) {
-				hoursString.insert(0, "0");
-			}
-
-			if (times[i]->minutes < 10) {
-				minutesString.insert(0, "0");
-			}
-
-			if (times[i]->seconds < 10) {
-				secondsString.insert(0, "0");
-			}
-
-			file << names[i] << "," << hoursString << ":" << minutesString << ":" << secondsString << "\n";
-		}
-	}
 
 	typedName = "";
 	names.clear();
@@ -578,6 +537,7 @@ void detectCollisions() {
 
 			if (gameTime.hours < timeToTest.hours) {
 				displayEnterName = true;
+				numFrames = 0;
 				indexToAdd = i;
 				break;
 			}
@@ -643,6 +603,7 @@ void displayTitle() {
 				//just instructions true so load the instructions page
 				displayMenuScreen = false;
 				displayInstructions = true;
+				counter = 0;
 				displayWin = false;
 				displayDefeat = false;
 				displayEnterName = false;
@@ -667,7 +628,6 @@ void displayTitle() {
 	else if (displayWin) {
 
 		//for displaying the buttons and titles
-		numFrames = 0;
 		if (mouse_x > 0 && mouse_x < 300)
 		{
 			startGameIconLoaded = false;
@@ -759,8 +719,8 @@ void displayTitle() {
 		}
 	}
 	else if (displayInstructions) {
-		numFrames++;
-		if (numFrames > 200000*dt) {
+		counter += dt;
+		if (counter > 20.0) {
 			if (leftPressed) {
 				displayMenuScreen = false;
 				displayInstructions = false;
@@ -999,10 +959,11 @@ void displayTitle() {
 			glPopMatrix();
 		glDisable(GL_TEXTURE_2D);
 
+		//display the leaderboard
+		if (numFrames == 0) {
+			BuildFont(30, 15);
+		}
 
-		//display the typed name
-		
-		BuildFont(30, 15);
 		for (int i = 0; i < times.size(); i++) {
 
 			if (i == indexToAdd) {
@@ -1011,8 +972,8 @@ void displayTitle() {
 			else {
 				glColor3f(1.0, 1.0, 1.0);
 			}
-			glRasterPos2f(400, 800 - i*50);
-			
+			glRasterPos2f(400, 800 - i * 50);
+
 
 			string hoursString;
 			string minutesString;
@@ -1060,8 +1021,8 @@ void displayTitle() {
 			glRasterPos2f(200, 800 - i * 50);
 			glPrint(ss3.str());
 		}
-		
-		
+			
+		numFrames++;
 		
 	}
 	else if (displayEnterName) {
@@ -1096,10 +1057,15 @@ void displayTitle() {
 		glDisable(GL_TEXTURE_2D);
 
 		//display the typed name
-		BuildFont(100, 50);
+		if (numFrames == 0) {
+			BuildFont(100, 50);
+		}
+		
+		numFrames++;
 		glRasterPos2f(250, screenHeight);
 		glColor3f(1.0, 1.0, 1.0);
 		glPrint(typedName);
+		
 	}
 }
 
@@ -1258,137 +1224,137 @@ void processKeys()
 	}
 
 	if (displayEnterName && (typedName.size() < 7)) {
-		numFrames++;
-		if (numFrames > 5* dt) {
+		counter += dt;
+		if (counter > 8.0) {
 			//letter A on the keyboard
 			if (keys[0x41]) {
 				typedName.append("a");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x42]) {
 				typedName.append("b");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x43]) {
 				typedName.append("c");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x44]) {
 				typedName.append("d");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x45]) {
 				typedName.append("e");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x46]) {
 				typedName.append("f");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x47]) {
 				typedName.append("g");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x48]) {
 				typedName.append("h");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x49]) {
 				typedName.append("i");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x4A]) {
 				typedName.append("j");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x4B]) {
 				typedName.append("k");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x4C]) {
 				typedName.append("l");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x4D]) {
 				typedName.append("m");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x4E]) {
 				typedName.append("n");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x4F]) {
 				typedName.append("o");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x50]) {
 				typedName.append("p");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x51]) {
 				typedName.append("q");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x52]) {
 				typedName.append("r");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x53]) {
 				typedName.append("s");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x54]) {
 				typedName.append("t");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x55]) {
 				typedName.append("u");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x56]) {
 				typedName.append("v");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x57]) {
 				typedName.append("w");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x58]) {
 				typedName.append("x");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x59]) {
 				typedName.append("y");
-				numFrames = 0;
+				counter = 0;
 			}
 
 			if (keys[0x5A]) {
 				typedName.append("z");
-				numFrames = 0;
+				counter = 0;
 			}
 		}
 	}
@@ -1445,6 +1411,61 @@ void processKeys()
 			for (int i = 0; i < newNames.size(); i++) {
 				names.push_back(newNames[i]);
 			}
+
+			numFrames = 0;
+
+			//Save the scoreboard and clear the arrays
+
+			ofstream file("leaderboard.csv");
+
+			if (file.is_open()) {
+				for (int i = 0; i < names.size(); i++) {
+					string hoursString;
+					string minutesString;
+					string secondsString;
+					stringstream ss;
+
+					ss << times[i]->hours;
+
+					hoursString = ss.str();
+
+					stringstream ss1;
+					ss1 << times[i]->minutes;
+
+					minutesString = ss1.str();
+
+					stringstream ss2;
+					ss2 << times[i]->seconds;
+
+					secondsString = ss2.str();
+
+					if (times[i]->hours < 10) {
+						hoursString.insert(0, "0");
+					}
+
+					if (times[i]->minutes < 10) {
+						minutesString.insert(0, "0");
+					}
+
+					if (times[i]->seconds < 10) {
+						secondsString.insert(0, "0");
+					}
+
+					file << names[i];
+					file << ",";
+					file << hoursString;
+					file << ":";
+					file << minutesString;
+					file << ":";
+					file << secondsString;
+					if (i != (names.size() - 1)) {
+						file << "\n";
+					}
+
+				}
+				file.close();
+			}
+			else cout << "Unable to open file";
 		}
 	}
 }
