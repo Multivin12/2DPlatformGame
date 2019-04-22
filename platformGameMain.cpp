@@ -217,6 +217,51 @@ void resetWorld() {
 
 		npc->resetCharacter();
 	}
+	BuildFont((int)round((double)screenHeight / 30.0), (int)round((double)screenHeight / 60.0));
+
+	//Save the scoreboard and clear the arrays
+	ofstream file("leaderboard.csv");
+
+	if (file.is_open()) {
+		for (int i = 0; i < names.size(); i++) {
+			string hoursString;
+			string minutesString;
+			string secondsString;
+			stringstream ss;
+
+			ss << times[i]->hours;
+
+			hoursString = ss.str();
+
+			stringstream ss1;
+			ss1 << times[i]->minutes;
+
+			minutesString = ss1.str();
+
+			stringstream ss2;
+			ss2 << times[i]->seconds;
+
+			secondsString = ss2.str();
+
+			if (times[i]->hours < 10) {
+				hoursString.insert(0, "0");
+			}
+
+			if (times[i]->minutes < 10) {
+				minutesString.insert(0, "0");
+			}
+
+			if (times[i]->seconds < 10) {
+				secondsString.insert(0, "0");
+			}
+
+			file << names[i] << "," << hoursString << ":" << minutesString << ":" << secondsString << "\n";
+		}
+	}
+
+	typedName = "";
+	names.clear();
+	times.clear();
 }
 
 void displayWorld() {
@@ -620,7 +665,7 @@ void displayTitle() {
 
 	}
 	else if (displayWin) {
-		cout << startGameIconLoaded << endl;
+
 		//for displaying the buttons and titles
 		numFrames = 0;
 		if (mouse_x > 0 && mouse_x < 300)
@@ -953,6 +998,71 @@ void displayTitle() {
 				glEnd();
 			glPopMatrix();
 		glDisable(GL_TEXTURE_2D);
+
+
+		//display the typed name
+		
+		BuildFont(30, 15);
+		for (int i = 0; i < times.size(); i++) {
+
+			if (i == indexToAdd) {
+				glColor3f(1.0, 0.0, 0.0);
+			}
+			else {
+				glColor3f(1.0, 1.0, 1.0);
+			}
+			glRasterPos2f(400, 800 - i*50);
+			
+
+			string hoursString;
+			string minutesString;
+			string secondsString;
+			stringstream ss;
+
+			ss << times[i]->hours;
+
+			hoursString = ss.str();
+
+			stringstream ss1;
+			ss1 << times[i]->minutes;
+
+			minutesString = ss1.str();
+
+			stringstream ss2;
+			ss2 << times[i]->seconds;
+
+			secondsString = ss2.str();
+
+			if (times[i]->hours < 10) {
+				hoursString.insert(0, "0");
+			}
+
+			if (times[i]->minutes < 10) {
+				minutesString.insert(0, "0");
+			}
+
+			if (times[i]->seconds < 10) {
+				secondsString.insert(0, "0");
+			}
+
+			//print the names
+			glPrint(names[i]);
+
+			//and their times
+			glRasterPos2f(800, 800 - i * 50);
+			glPrint(hoursString + ":" + minutesString + ":" + secondsString);
+
+
+			stringstream ss3;
+			ss3 << (i + 1);
+
+
+			glRasterPos2f(200, 800 - i * 50);
+			glPrint(ss3.str());
+		}
+		
+		
+		
 	}
 	else if (displayEnterName) {
 		//display the win screen
@@ -1289,6 +1399,52 @@ void processKeys()
 			displayEnterName = false;
 			startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
 			instructionsButtonIcon = loadPNG("Sprites/background.png");
+
+			//to shift all the elements in the time and name array down as the person has made it onto the leaderboard
+			if (typedName.size() == 0) {
+				typedName = "player";
+			}
+			string nameToAdd = typedName;
+			Duration * timeToAdd = &gameTime;
+
+			vector<string>newNames = {};
+			vector<Duration*> newTimes = {};
+
+			for (int i = 0; i < names.size(); i++) {
+				if (i == indexToAdd) {
+					newNames.push_back(nameToAdd);
+				}
+				else if (i > indexToAdd) {
+					newNames.push_back(names[(i-1)]);
+				}
+				else {
+					newNames.push_back(names[i]);
+				}
+			}
+
+			for (int i = 0; i < times.size(); i++) {
+				if (i == indexToAdd) {
+					newTimes.push_back(timeToAdd);
+				}
+				else if (i > indexToAdd) {
+					newTimes.push_back(times[(i - 1)]);
+				}
+				else {
+					newTimes.push_back(times[i]);
+				}
+			}
+
+			//copy over the new data into the names and times arrays
+			times.clear();
+			names.clear();
+
+			for (int i = 0; i < newTimes.size(); i++) {
+				times.push_back(newTimes[i]);
+			}
+
+			for (int i = 0; i < newNames.size(); i++) {
+				names.push_back(newNames[i]);
+			}
 		}
 	}
 }

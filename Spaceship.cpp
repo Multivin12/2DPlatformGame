@@ -40,6 +40,7 @@ void Spaceship::resetCharacter() {
 	areCollidingPlatform = true;
 
 	isCollidingPlayer = false;
+	loadTexture("Sprites/spaceshipStill.png");
 }
 
 Spaceship::~Spaceship()
