@@ -2,9 +2,12 @@
 #include <iostream>
 
 
-MovingPlatform::MovingPlatform()
+MovingPlatform::MovingPlatform(double Xspeed, double distanceTravelledX, double Yspeed, double distanceTravelledY)
 {
-
+	this->Xspeed = Xspeed;
+	this->distanceTravelledX = distanceTravelledX;
+	this->Yspeed = Yspeed;
+	this->distanceTravelledY = distanceTravelledY;
 }
 
 /*
@@ -23,24 +26,22 @@ std::string MovingPlatform::typeOfCollision(GameCharacter& p,double dt) {
 
 	//Test if the max of a platform is less than the player's minimum plus a certain threshold
 	if (platform.getMaxY() <= player.getMinY() + 128.0*dt) {
+
 		double difference = player.getMinY() - platform.getMaxY();
 		p.YPla -= difference;
 
-
-		p.XPla += Xspeed * dt;
-
-		p.YPla += 2.0*Yspeed * dt;
-
+		if (Xspeed != 0.0) {
+			p.XPla += Xspeed*dt;
+		}
+		
 		return "top";
 	}
 
 	//Test if the min of a platform is greater than the player's minimum minus a certain threshold
-	if (platform.getMinY() >= player.getMaxY() - 48.0*dt) {
+	if (platform.getMinY() >= player.getMaxY() - 64.0*dt) {
 
 		double difference = player.getMaxY() - platform.getMinY();
 		p.YPla -= difference;
-
-		p.YPla += Yspeed * dt;
 		
 		return "bottom";
 	}
@@ -69,12 +70,12 @@ void MovingPlatform::updatePlatformMovement(double dt) {
 	//equation for updating displacement
 	XPla += 0.5f*(Xspeed + oldXspeed)*dt;
 
-	if (XPla > 860.0f || XPla < 0.0f) {
+	if (XPla > distanceTravelledX || XPla < 0.0f) {
 		if (XPla < 0.0f) {
 			XPla = 0.0f;
 		}
-		if (XPla > 860.0f) {
-			XPla = 860.0f;
+		if (XPla > distanceTravelledX) {
+			XPla = distanceTravelledX;
 		}
 		oldXspeed = -oldXspeed;
 		Xspeed = -Xspeed;
@@ -84,12 +85,12 @@ void MovingPlatform::updatePlatformMovement(double dt) {
 	//Now update the Y movements
 	YPla = YPla + 0.5*(Yspeed + oldYspeed)*dt;
 
-	if (YPla > 860.0f || YPla < 0.0f) {
+	if (YPla > distanceTravelledY || YPla < 0.0f) {
 		if (YPla < 0.0f) {
-			XPla = 0.0f;
+			YPla = 0.0f;
 		}
-		if (YPla > 860.0f) {
-			YPla = 860.0f;
+		if (YPla > distanceTravelledY) {
+			YPla = distanceTravelledY;
 		}
 		oldYspeed = -oldYspeed;
 		Yspeed = -Yspeed;

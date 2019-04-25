@@ -61,15 +61,15 @@ Platform ground;
 Platform plat1;
 Platform plat2;
 Platform plat3;
-MovingPlatform plat4;
+MovingPlatform plat4(20.0f, 860.0f, 0.0f, 0.0f);
 vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
 
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.000003; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.0000075; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
-										//0.000008 recommended for PC, 0.000003 for my laptop.
+										//0.0000075 recommended for PC, 0.000003 for my laptop.
 double counter = 0;
 //Textures
 GLuint background = 0;
@@ -258,7 +258,7 @@ void displayWorld() {
 	glColor3f(1, 1, 1);
 	glPushMatrix();
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		ground.createPlatformAndDraw(-10000, 0, -10000, 120, 10000, 120, 10000, 0, screenWidth, screenHeight);
+		ground.createPlatformAndDraw(-10000, 0, -10000, 120, 10000, 120, 10000, 0);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		ground.createOBB(matrix);
 	glPopMatrix();
@@ -270,7 +270,7 @@ void displayWorld() {
 	glPushMatrix();
 		plat1.textureWrapType = 1;
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat1.createPlatformAndDraw(400, 260, 400, 500, 1000, 500, 1000, 260,screenWidth, screenHeight);
+		plat1.createPlatformAndDraw(400, 260, 400, 500, 1000, 500, 1000, 260);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat1.createOBB(matrix);
 	glPopMatrix();
@@ -278,7 +278,7 @@ void displayWorld() {
 	glPushMatrix();
 		plat2.textureWrapType = 1;
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat2.createPlatformAndDraw(200, 230, 200, 305, 400, 305, 400, 230, screenWidth, screenHeight);
+		plat2.createPlatformAndDraw(200, 230, 200, 305, 400, 305, 400, 230);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat2.createOBB(matrix);
 	glPopMatrix();
@@ -288,7 +288,7 @@ void displayWorld() {
 	glPushMatrix();
 		plat3.textureWrapType = 1;
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat3.createPlatformAndDraw(800, 600, 800, 780, 2000, 780, 2000, 600, screenWidth, screenHeight);
+		plat3.createPlatformAndDraw(800, 600, 800, 780, 2000, 780, 2000, 600);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat3.createOBB(matrix);
 	glPopMatrix();
@@ -297,7 +297,7 @@ void displayWorld() {
 	glPushMatrix();
 		plat4.textureWrapType = 1;
 		glTranslatef(-Xdir + plat4.XPla, -Ydir + plat4.YPla, 0.0);
-		plat4.createPlatformAndDraw(1600, 850, 1600, 1030, 2800, 1030, 2800, 850, screenWidth, screenHeight);
+		plat4.createPlatformAndDraw(1600, 850, 1600, 1030, 2800, 1030, 2800, 850);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		plat4.createOBB(matrix);
 	glPopMatrix();

@@ -22,7 +22,7 @@ public:
 	Platform();
 	void loadTexture(char* texturePath);
 	GLuint loadPNG(char* name);
-	void createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y,float screenWidth,float screenHeight);
+	void createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y);
 	void createOBB(float matrix[16]);
 	void drawOBB(void);
 	virtual std::string typeOfCollision(GameCharacter &p,double dt);

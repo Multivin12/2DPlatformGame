@@ -10,7 +10,7 @@ Platform::Platform()
 {
 }
 
-void Platform::createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y,float screenWidth,float screenHeight) {
+void Platform::createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y) {
 
 	this->points[0].x = p1x;
 	this->points[0].y = p1y;
@@ -93,7 +93,7 @@ std::string Platform::typeOfCollision(GameCharacter& p,double dt) {
 	}
 		
 	//Test if the min of a platform is greater than the player's minimum minus a certain threshold
-	if (platform.getMinY() >= player.getMaxY() - 48.0*dt) {
+	if (platform.getMinY() >= player.getMaxY() - 64.0*dt) {
 
 		double difference = player.getMaxY() - platform.getMinY();
 		p.YPla -= difference;

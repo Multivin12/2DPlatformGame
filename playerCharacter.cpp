@@ -97,6 +97,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 			for (std::vector<std::string>::iterator it = collisionStatuses.begin();
 				it != collisionStatuses.end(); it++) {
 
+				cout << *it << endl;
 				if (*it == "side") {
 					XPla = XPla - 3.0f*(Xspeed + oldXspeed)*dt;
 
@@ -124,6 +125,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 			}
 		}
 		else {
+			cout << "No collision" << endl;
 			//if it's not colliding, you want it to be subject to gravity
 			Yspeed = oldYspeed - YspeedInc * dt;
 		}
@@ -166,7 +168,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 			int frameGap = (int)round((15.0 / abs(Xspeed))*20.0f);
 			//now update the texture
 			if (Xspeed == 0.0) {
-
+				//Don't change the texture
 			}
 			//(round(15.0/Xspeed)*30.0f) this calculation is so that the sprite switches between images
 			//when it is moving faster.
