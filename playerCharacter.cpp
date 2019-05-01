@@ -97,7 +97,7 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 			for (std::vector<std::string>::iterator it = collisionStatuses.begin();
 				it != collisionStatuses.end(); it++) {
 
-				cout << *it << endl;
+				
 				if (*it == "side") {
 					XPla = XPla - 3.0f*(Xspeed + oldXspeed)*dt;
 
@@ -125,7 +125,6 @@ void PlayerCharacter::updatePlayerMovement(double dt) {
 			}
 		}
 		else {
-			cout << "No collision" << endl;
 			//if it's not colliding, you want it to be subject to gravity
 			Yspeed = oldYspeed - YspeedInc * dt;
 		}

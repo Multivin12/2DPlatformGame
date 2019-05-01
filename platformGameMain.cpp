@@ -52,22 +52,28 @@ float Ydir = 0;
 //Object for handling the player character
 PlayerCharacter player;
 Spaceship spaceship;
-//enemys xspeed, the colour, and the max distance to travel from its starting position
-NPC enemy(10.0f,"blue", 860.0f);
+
+
+//enemys xspeed, the colour, the max X distance, num lives, damage inflicted, whether the enemy can jump and the speed of the jump
+NPC enemy(10.0f,"red", 860.0f,1,1,false,70.0f);
 vector<NPC*> enemys = { &enemy };
+
 
 //Object for handling the ground platform
 Platform ground;
 Platform plat1;
 Platform plat2;
 Platform plat3;
+//Xspeed of the platform, max X distance, Yspeed of the platform and the max Y distance
 MovingPlatform plat4(20.0f, 860.0f, 0.0f, 0.0f);
+
 vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
+vector<MovingPlatform*> movingPlatforms = { &plat4 };
 
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.0000075; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.000003; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
 										//0.0000075 recommended for PC, 0.000003 for my laptop.
 double counter = 0;
@@ -305,7 +311,7 @@ void displayWorld() {
 	//The NPC
 	glPushMatrix();
 		glTranslatef(-Xdir + enemy.XPla, -Ydir + enemy.YPla, 0.0);
-		enemy.addPointsandDraw(900, 780, 900, 900, 1000, 900, 1000, 780);
+		enemy.addPointsandDraw(900, 780, 900, 1020, 1200, 1020, 1200, 780);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		enemy.createOBB(matrix);
 	glPopMatrix();
@@ -424,33 +430,6 @@ void detectCollisions() {
 			}
 		}
 
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		//enemy collisions
-
-		//This part is for testing which platforms are colliding with the player
-		isColliding = false;
-
-		for (vector<Platform*>::iterator it = platforms.begin();
-			it != platforms.end(); it++) {
-
-			Platform * platform = *it;
-
-			//For handling collisions
-			isColliding = enemy.boundingBox.SAT2D(platform->boundingBox);
-
-			//if it's colliding with the ground then set the collision status to that object corresponding to that object
-			if (isColliding) {
-				enemy.areCollidingPlatform = true;
-				enemy.collisionStatuses.push_back(platform->typeOfCollision(enemy, dt));
-			}
-		}
-
-		//so the player is not colliding with anything at all
-		if (enemy.collisionStatuses.empty()) {
-			enemy.areCollidingPlatform = false;
-		}
-
 		//test if the player has reached the end of the game
 		spaceship.isCollidingPlayer = player.boundingBox.SAT2D(spaceship.boundingBox);
 		player.collidingSpaceship = player.boundingBox.SAT2D(spaceship.boundingBox);
@@ -464,6 +443,33 @@ void detectCollisions() {
 	else {
 		player.textureID = 0;
 	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	//enemy collisions
+
+	//This part is for testing which platforms are colliding with the player
+	bool isColliding = false;
+
+	for (vector<Platform*>::iterator it = platforms.begin();
+		it != platforms.end(); it++) {
+
+		Platform * platform = *it;
+
+		//For handling collisions
+		isColliding = enemy.boundingBox.SAT2D(platform->boundingBox);
+
+		//if it's colliding with the ground then set the collision status to that object corresponding to that object
+		if (isColliding) {
+			enemy.areCollidingPlatform = true;
+			enemy.collisionStatuses.push_back(platform->typeOfCollision(enemy, dt));
+		}
+	}
+
+	//so the player is not colliding with anything at all
+	if (enemy.collisionStatuses.empty()) {
+		enemy.areCollidingPlatform = false;
+	}
 	
 	if (player.livesLeft <= 0) {
 		displayDefeat = true;
@@ -472,7 +478,7 @@ void detectCollisions() {
 	}
 
 	//Test if the player has made it onto the leaderboard
-	if (spaceship.Yspeed > 200) {
+	if (spaceship.Yspeed > 100) {
 
 		ifstream inFile("leaderboard.csv");
 
@@ -562,6 +568,7 @@ void detectCollisions() {
 		}
 		if (!displayEnterName) {
 			displayWin = true;
+			indexToAdd = -1;
 		}
 		
 	}
@@ -1490,13 +1497,31 @@ void TimeSimulation() {
 
 void update()
 {
-	plat4.updatePlatformMovement(dt);
 
-	player.updatePlayerMovement(dt);
+	if (!displayMenuScreen && !displayInstructions && !displayWin && !displayDefeat && !displayEnterName) {
 
-	enemy.updatePlayerMovement(dt);
+		player.updatePlayerMovement(dt);
 
-	spaceship.updatePlayerMovement(dt);
+		for (int i = 0; i < movingPlatforms.size(); i++) {
+			movingPlatforms[i]->updatePlatformMovement(dt);
+		}
+
+		for (int i = 0; i < enemys.size(); i++) {
+
+			enemys[i]->updatePlayerMovement(dt);
+
+			//update the jumping movement
+			if (enemys[i]->jumping) {
+				if (!enemys[i]->jumpPressed) {
+					enemys[i]->oldYspeed = 0.0f;
+					enemys[i]->Yspeed = enemys[i]->jumpSpeed;
+					enemys[i]->jumpPressed = true;
+				}
+			}
+		}
+
+		spaceship.updatePlayerMovement(dt);
+	}
 }
 /**************** END OPENGL FUNCTIONS *************************/
 

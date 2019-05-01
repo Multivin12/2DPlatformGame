@@ -8,19 +8,16 @@
 /*
  * Constructor for this class, builds the polygon by invoking the GameCharacter() super class.
 */
-NPC::NPC(float Xspeed, string colour, float distanceTravelled):GameCharacter()
+NPC::NPC(float Xspeed, string colour, float distanceTravelled,int lives,int damageInflicted,bool jumping, float jumpSpeed):GameCharacter()
 {
 	this->Xspeed = Xspeed;
 	oldXspeed = Xspeed;
 	this->colour = colour;
 	this->distanceTravelled = distanceTravelled;
-
-	if (this->colour == "blue") {
-		startingLives = 1;
-	}
-	else if (this->colour == "armour") {
-		startingLives = 2;
-	}
+	this->damageInflicted = damageInflicted;
+	this->jumping = jumping;
+	this->jumpSpeed = jumpSpeed;
+	startingLives = lives;
 
 	livesLeft = startingLives;
 }
@@ -47,7 +44,7 @@ void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
 			//bottom side
 			else if (npc.getMinY() >= player.getMaxY() - 48.0*dt) {
 				p.Yspeed = -0.5f*p.Yspeed;
-				p.livesLeft--;
+				p.livesLeft -= damageInflicted;
 				p.coolDown = true;
 			}
 			else {
@@ -60,7 +57,7 @@ void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
 				else if (npc.getMinX() >= player.getMaxX() - 64.0*dt) {
 					p.Xspeed = Xspeed * 2.0;
 				}
-				p.livesLeft--;
+				p.livesLeft -= damageInflicted;
 				p.coolDown = true;
 			}
 		}
@@ -82,8 +79,8 @@ void NPC::updatePlayerMovement(double dt) {
 		YPla = -99999999;
 	} else if (!isDead) {
 		//update all the X movements
-	//if right has been pressed increase the speed up to 2.0
-	//equation for updating displacement
+		//if right has been pressed increase the speed up to 2.0
+		//equation for updating displacement
 		XPla += Xspeed * dt;
 
 		if (XPla > distanceTravelled || XPla < 0.0f) {
@@ -113,7 +110,6 @@ void NPC::updatePlayerMovement(double dt) {
 			for (std::vector<std::string>::iterator it = collisionStatuses.begin();
 				it != collisionStatuses.end(); it++) {
 
-
 				if (*it == "side") {
 					XPla = XPla - 3.0f*(Xspeed + oldXspeed)*dt;
 
@@ -124,8 +120,9 @@ void NPC::updatePlayerMovement(double dt) {
 				else if (*it == "top") {
 
 					//collision response
-					Yspeed = 0;
-					oldYspeed = 0;
+					jumpPressed = false;
+					Yspeed = 0.0;
+					oldYspeed = 0.0;
 				}
 				else if (*it == "bottom") {
 					Yspeed = -2.0f;
@@ -165,6 +162,7 @@ void NPC::updatePlayerMovement(double dt) {
 		}
 	}
 	else {
+		//run when the alien is dying
 		if (Xspeed < 0) {
 			textureDirection = false;
 		}
@@ -218,6 +216,7 @@ void NPC::updatePlayerMovement(double dt) {
 void NPC::resetCharacter() {
 	YPla = 0;
 	YspeedInc = 7.5f;
+	jumpPressed = false;
 
 	XPla = 0.0;
 	XspeedInc = 1.5f;
