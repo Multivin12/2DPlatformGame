@@ -13,7 +13,6 @@ public:
 	bool jumpPressed = false;
 	bool leftPressed = false;
 	bool rightPressed = false;
-
 	//counter to count how long the jump button has been hold down for
 	int jumpCounter = 0;
 

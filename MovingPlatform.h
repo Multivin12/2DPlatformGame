@@ -8,6 +8,7 @@ public:
 	double Xspeed = 10.0f;
 	double oldXspeed = 10.0f;
 	double distanceTravelledX = 0.0f;
+	double originalXspeed = 0.0f;
 
 	double YPla = 0;
 	double Yspeed = 0.0f;

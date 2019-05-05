@@ -10,7 +10,7 @@ Platform::Platform()
 {
 }
 
-void Platform::createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y) {
+void Platform::createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y, float p3x, float p3y, float p4x, float p4y,float wrapScale) {
 
 	this->points[0].x = p1x;
 	this->points[0].y = p1y;
@@ -29,8 +29,8 @@ void Platform::createPlatformAndDraw(float p1x, float p1y, float p2x, float p2y,
 			if (textureWrapType == 0) {
 				glTexCoord2f(0, 0); glVertex2f(points[0].x, points[0].y);
 				glTexCoord2f(0, 1); glVertex2f(points[1].x, points[1].y);
-				glTexCoord2f(20000.0/128.0, 1); glVertex2f(points[2].x, points[2].y);
-				glTexCoord2f(20000.0/128.0, 0); glVertex2f(points[3].x, points[3].y);
+				glTexCoord2f(wrapScale/128.0, 1); glVertex2f(points[2].x, points[2].y);
+				glTexCoord2f(wrapScale/128.0, 0); glVertex2f(points[3].x, points[3].y);
 			}
 			else if(textureWrapType ==1 ) {
 				glTexCoord2f(0, 0); glVertex2f(points[0].x, points[0].y);

@@ -19,6 +19,7 @@ NPC::NPC(float Xspeed, string colour, float distanceTravelled,int lives,int dama
 	this->jumpSpeed = jumpSpeed;
 	startingLives = lives;
 
+	originalXspeed = Xspeed;
 	livesLeft = startingLives;
 }
 
@@ -61,6 +62,22 @@ void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
 				p.coolDown = true;
 			}
 		}
+		else {
+			if (npc.getMaxY() <= player.getMinY() + 128.0*dt) {
+				p.Yspeed = -p.Yspeed;
+				textureNumber = 0;
+				livesLeft--;
+				if (livesLeft == 0) {
+					isDead = true;
+				}
+			}
+			//bottom side
+			else if (npc.getMinY() >= player.getMaxY() - 48.0*dt) {
+
+			}
+			else {
+			}
+		}
 	}
 }
 
@@ -83,23 +100,45 @@ void NPC::updatePlayerMovement(double dt) {
 		//equation for updating displacement
 		XPla += Xspeed * dt;
 
-		if (XPla > distanceTravelled || XPla < 0.0f) {
-			if (XPla < 0.0f) {
-				XPla = 0.0f;
-			}
-			if (XPla > distanceTravelled) {
-				XPla = distanceTravelled;
-			}
-			oldXspeed = -oldXspeed;
-			Xspeed = -Xspeed;
+		if (originalXspeed > 0) {
+			if (XPla > distanceTravelled || XPla < 0.0f) {
+				if (XPla < 0.0f) {
+					XPla = 0.0f;
+				}
+				if (XPla > distanceTravelled) {
+					XPla = distanceTravelled;
+				}
+				oldXspeed = -oldXspeed;
+				Xspeed = -Xspeed;
 
-			if (textureDirection) {
-				textureDirection = false;
-			}
-			else {
-				textureDirection = true;
-			}
+				if (textureDirection) {
+					textureDirection = false;
+				}
+				else {
+					textureDirection = true;
+				}
 
+			}
+		}
+		else {
+			if (XPla < -distanceTravelled || XPla > 0.0f) {
+				if (XPla > 0.0f) {
+					XPla = 0.0f;
+				}
+				if (XPla < -distanceTravelled) {
+					XPla = -distanceTravelled;
+				}
+				oldXspeed = -oldXspeed;
+				Xspeed = -Xspeed;
+
+				if (textureDirection) {
+					textureDirection = false;
+				}
+				else {
+					textureDirection = true;
+				}
+
+			}
 		}
 
 		//Now update the Y movements

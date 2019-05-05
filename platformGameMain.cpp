@@ -55,25 +55,43 @@ Spaceship spaceship;
 
 
 //enemys xspeed, the colour, the max X distance, num lives, damage inflicted, whether the enemy can jump and the speed of the jump
-NPC enemy(10.0f,"red", 860.0f,1,1,false,70.0f);
-vector<NPC*> enemys = { &enemy };
+NPC enemy1(10.0f,"blue", 1200.0f,1,1,false,70.0f);
+NPC enemy2(15.0f, "green", 1100.0f, 1, 1,true, 70.0f);
+NPC enemy3(25.0f, "red", 700.0f, 1, 1, false, 70.0f);
+NPC enemy4(25.0f, "red", 1400.0f, 1, 1, false, 70.0f);
+NPC enemy5(-25.0f, "red", 1400.0f, 1, 1, false, 70.0f);
+NPC enemy6(15.0f, "armour", 900.0f, 2, 1, false, 70.0f);
+NPC enemy7(25.0f, "boss", 2500.0f, 2, 2, true, 70.0f);
+vector<NPC*> enemys = {&enemy1,&enemy2,&enemy3,&enemy4 ,&enemy5,&enemy6,&enemy7 };
 
 
-//Object for handling the ground platform
-Platform ground;
-Platform plat1;
-Platform plat2;
-Platform plat3;
-//Xspeed of the platform, max X distance, Yspeed of the platform and the max Y distance
-MovingPlatform plat4(20.0f, 860.0f, 0.0f, 0.0f);
+//List of platforms
+Platform groundPlat1;
+Platform groundPlat2;
+Platform groundPlat3;
+Platform lev1Plat1;
+Platform lev3Plat1;
+Platform lev4Plat1;
+Platform lev6Plat1;
+Platform lev7Plat1;
+Platform lev8Plat3;
 
-vector<Platform*> platforms = { &ground,&plat1,&plat2,&plat3,&plat4};
-vector<MovingPlatform*> movingPlatforms = { &plat4 };
+
+//List of moving platforms
+MovingPlatform lev2Plat1(20.0f, 660.0f, 0.0f, 0.0f);
+MovingPlatform lev5Plat1(10.0f, 1000.0f, 0.0f, 0.0f);
+MovingPlatform lev5Plat2(-10.0f, 1000.0f, 0.0f, 0.0f);
+MovingPlatform lev8Plat1(-10.0f, 1000.0f, 0.0f, 0.0f);
+MovingPlatform lev8Plat2(10.0f, 1000.0f, 0.0f, 0.0f);
+
+
+vector<Platform*> platforms = { &groundPlat1,&groundPlat2,&groundPlat3,&lev1Plat1,&lev2Plat1,&lev3Plat1,&lev4Plat1,&lev5Plat1,&lev5Plat2,&lev6Plat1,&lev7Plat1,&lev8Plat1,&lev8Plat2,&lev8Plat3};
+vector<MovingPlatform*> movingPlatforms = { &lev2Plat1,&lev5Plat1 ,&lev5Plat2,&lev8Plat1,&lev8Plat2 };
 
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.000003; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.0000075; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
 										//0.0000075 recommended for PC, 0.000003 for my laptop.
 double counter = 0;
@@ -222,7 +240,7 @@ void resetWorld() {
 
 		npc->resetCharacter();
 	}
-	BuildFont((int)round((double)screenHeight / 30.0), (int)round((double)screenHeight / 60.0));
+	BuildFont((int)round((double)screenHeight / 40.0), (int)round((double)screenHeight / 75.0));
 
 	typedName = "";
 	names.clear();
@@ -260,66 +278,199 @@ void displayWorld() {
 		player.createOBB(matrix);
 	glPopMatrix();
 
-	//The surface
+	//Platforms
 	glColor3f(1, 1, 1);
 	glPushMatrix();
+		groundPlat1.textureWrapType = 1;
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		ground.createPlatformAndDraw(-10000, 0, -10000, 120, 10000, 120, 10000, 0);
+		groundPlat1.createPlatformAndDraw(-500, 0, -500, 120, 1600, 120, 1600, 0,1200);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-		ground.createOBB(matrix);
+		groundPlat1.createOBB(matrix);
 	glPopMatrix();
 
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		groundPlat2.textureWrapType = 1;
+		glTranslatef(-Xdir, -Ydir, 0.0);
+		groundPlat2.createPlatformAndDraw(2000, 0, 2000, 120, 2500, 120, 2500, 0, 600);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		groundPlat2.createOBB(matrix);
+	glPopMatrix();
 
-	//Platforms
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		groundPlat3.textureWrapType = 1;
+		glTranslatef(-Xdir, -Ydir, 0.0);
+		groundPlat3.createPlatformAndDraw(2900, 0, 2900, 120, 4300, 120, 4300, 0, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		groundPlat3.createOBB(matrix);
+	glPopMatrix();
+
+	/////////////////////////////////////////////////////////////////////
+	glPushMatrix();
+		glTranslatef(-Xdir + enemy1.XPla, -Ydir + enemy1.YPla, 0.0);
+		enemy1.addPointsandDraw(2900, 120, 2900, 270, 3000, 270, 3000, 120);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		enemy1.createOBB(matrix);
+	glPopMatrix();
+	/////////////////////////////////////////////////////////////////////
+
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		lev1Plat1.textureWrapType = 1;
+		glTranslatef(-Xdir, -Ydir, 0.0);
+		lev1Plat1.createPlatformAndDraw(4550, 300, 4550, 420, 5050, 420, 5050, 300, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		lev1Plat1.createOBB(matrix);
+	glPopMatrix();
+
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		lev2Plat1.textureWrapType = 1;
+		glTranslatef(-Xdir + lev2Plat1.XPla, -Ydir + lev2Plat1.YPla, 0.0);
+		lev2Plat1.createPlatformAndDraw(3390, 600, 3390, 720, 3890, 720, 3890, 600, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		lev2Plat1.createOBB(matrix);
+	glPopMatrix();
+
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		lev3Plat1.textureWrapType = 1;
+		glTranslatef(-Xdir, -Ydir, 0.0);
+		lev3Plat1.createPlatformAndDraw(1990, 900, 1990, 1020, 3290, 1020, 3290, 900, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		lev3Plat1.createOBB(matrix);
+	glPopMatrix();
+
+	/////////////////////////////////////////////////////////////////////
+	glPushMatrix();
+		glTranslatef(-Xdir + enemy2.XPla, -Ydir + enemy2.YPla, 0.0);
+		enemy2.addPointsandDraw(1990, 1020, 1990, 1170, 2090, 1170,2090, 1020);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		enemy2.createOBB(matrix);
+	glPopMatrix();
+	/////////////////////////////////////////////////////////////////////
+
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		lev4Plat1.textureWrapType = 1;
+		glTranslatef(-Xdir, -Ydir, 0.0);
+		lev4Plat1.createPlatformAndDraw(1000, 1200, 1000, 1320, 1790, 1320, 1790, 1200, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		lev4Plat1.createOBB(matrix);
+	glPopMatrix();
+
+	/////////////////////////////////////////////////////////////////////
+	glPushMatrix();
+		glTranslatef(-Xdir + enemy3.XPla, -Ydir + enemy3.YPla, 0.0);
+		enemy3.addPointsandDraw(1000, 1320, 1000, 1470, 1100, 1470, 1100, 1320);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		enemy3.createOBB(matrix);
+	glPopMatrix();
+	/////////////////////////////////////////////////////////////////////
+
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		lev5Plat1.textureWrapType = 1;
+		glTranslatef(-Xdir + lev5Plat1.XPla, -Ydir + lev5Plat1.YPla, 0.0);
+		lev5Plat1.createPlatformAndDraw(1890, 1500, 1890, 1620, 2590, 1620, 2590, 1500, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		lev5Plat1.createOBB(matrix);
+	glPopMatrix();
+
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		lev5Plat2.textureWrapType = 1;
+		glTranslatef(-Xdir + lev5Plat2.XPla, -Ydir + lev5Plat2.YPla, 0.0);
+		lev5Plat2.createPlatformAndDraw(4790, 1500, 4790, 1620, 5490, 1620, 5490, 1500, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		lev5Plat2.createOBB(matrix);
+	glPopMatrix();
+
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		lev6Plat1.textureWrapType = 1;
+		glTranslatef(-Xdir, -Ydir, 0.0);
+		lev6Plat1.createPlatformAndDraw(5690, 1800, 5690, 1920, 7290, 1920, 7290, 1800, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		lev6Plat1.createOBB(matrix);
+	glPopMatrix();
+
+	/////////////////////////////////////////////////////////////////////
+	glPushMatrix();
+		glTranslatef(-Xdir + enemy4.XPla, -Ydir + enemy4.YPla, 0.0);
+		enemy4.addPointsandDraw(5690, 1920, 5690, 2070, 5790, 2070, 5790, 1920);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		enemy4.createOBB(matrix);
+	glPopMatrix();
+
+	glPushMatrix();
+		glTranslatef(-Xdir + enemy5.XPla, -Ydir + enemy5.YPla, 0.0);
+		enemy5.addPointsandDraw(7140, 1920, 7140, 2070, 7240, 2070, 7240, 1920);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		enemy5.createOBB(matrix);
+	glPopMatrix();
+	/////////////////////////////////////////////////////////////////////
+
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		lev7Plat1.textureWrapType = 1;
+		glTranslatef(-Xdir, -Ydir, 0.0);
+		lev7Plat1.createPlatformAndDraw(7490, 2100, 7490, 2220, 8490, 2220, 8490, 2100, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		lev7Plat1.createOBB(matrix);
+	glPopMatrix();
+
+	/////////////////////////////////////////////////////////////////////
+	glPushMatrix();
+		glTranslatef(-Xdir + enemy6.XPla, -Ydir + enemy6.YPla, 0.0);
+		enemy6.addPointsandDraw(7490, 2220, 7490, 2370, 7590, 2370, 7590, 2220);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		enemy6.createOBB(matrix);
+	glPopMatrix();
+	/////////////////////////////////////////////////////////////////////
+
+	glColor3f(1, 1, 1);
+	glPushMatrix();
+		lev8Plat1.textureWrapType = 1;
+		glTranslatef(-Xdir + lev8Plat1.XPla, -Ydir + lev8Plat1.YPla, 0.0);
+		lev8Plat1.createPlatformAndDraw(6590, 2400, 6590, 2520, 7390, 2520, 7390, 2400, 900);
+		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
+		lev8Plat1.createOBB(matrix);
+	glPopMatrix();
+
 	
-	glColor3f(1.0, 1.0, 1.0);
+	glColor3f(1, 1, 1);
 	glPushMatrix();
-		plat1.textureWrapType = 1;
-		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat1.createPlatformAndDraw(400, 260, 400, 500, 1000, 500, 1000, 260);
+		lev8Plat2.textureWrapType = 1;
+		glTranslatef(-Xdir + lev8Plat2.XPla, -Ydir + lev8Plat2.YPla, 0.0);
+		lev8Plat2.createPlatformAndDraw(3590, 2400, 3590, 2520, 4390, 2520, 4390, 2400, 900);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-		plat1.createOBB(matrix);
+		lev8Plat2.createOBB(matrix);
 	glPopMatrix();
 
+	glColor3f(1, 1, 1);
 	glPushMatrix();
-		plat2.textureWrapType = 1;
+		lev8Plat3.textureWrapType = 1;
 		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat2.createPlatformAndDraw(200, 230, 200, 305, 400, 305, 400, 230);
+		lev8Plat3.createPlatformAndDraw(90, 2400, 90, 2520, 3290, 2520, 3290, 2400, 900);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-		plat2.createOBB(matrix);
+		lev8Plat3.createOBB(matrix);
 	glPopMatrix();
 	
-
-	//A platform with an NPC on
+	/////////////////////////////////////////////////////////////////////
 	glPushMatrix();
-		plat3.textureWrapType = 1;
-		glTranslatef(-Xdir, -Ydir, 0.0);
-		plat3.createPlatformAndDraw(800, 600, 800, 780, 2000, 780, 2000, 600);
+	glTranslatef(-Xdir + enemy7.XPla, -Ydir + enemy7.YPla, 0.0);
+		enemy7.addPointsandDraw(450, 2520, 450, 2720, 600, 2720, 600, 2520);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-		plat3.createOBB(matrix);
+		enemy7.createOBB(matrix);
 	glPopMatrix();
-
-	//A moving platform
-	glPushMatrix();
-		plat4.textureWrapType = 1;
-		glTranslatef(-Xdir + plat4.XPla, -Ydir + plat4.YPla, 0.0);
-		plat4.createPlatformAndDraw(1600, 850, 1600, 1030, 2800, 1030, 2800, 850);
-		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-		plat4.createOBB(matrix);
-	glPopMatrix();
-
-	//The NPC
-	glPushMatrix();
-		glTranslatef(-Xdir + enemy.XPla, -Ydir + enemy.YPla, 0.0);
-		enemy.addPointsandDraw(900, 780, 900, 1020, 1200, 1020, 1200, 780);
-		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
-		enemy.createOBB(matrix);
-	glPopMatrix();
+	/////////////////////////////////////////////////////////////////////
 
 	//the spaceship that marks the end of the game
 	glPushMatrix();
 		glTranslatef(-Xdir + spaceship.XPla, -Ydir + spaceship.YPla, 0.0);
-		spaceship.addPointsandDraw(1800, 120, 1800, 500, 2100, 500, 2100, 120);
+		spaceship.addPointsandDraw(100, 2520, 100, 2900, 400, 2900, 400, 2520);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		spaceship.createOBB(matrix);
 	glPopMatrix();
@@ -355,7 +506,7 @@ void displayScore() {
 		hourString = std::to_string(gameTime.hours);
 	}
 
-	glRasterPos2f(screenWidth * 2 - 640, screenHeight * 2 - 100);
+	glRasterPos2f(screenWidth * 2*0.6, screenHeight * 2 - 100);
 	glColor3f(1.0, 1.0, 1.0);
 	glPrint("Time Taken: " + hourString + ":" + minString + ":" + secString);	// Print GL Text To The Screen
 
@@ -448,28 +599,31 @@ void detectCollisions() {
 
 	//enemy collisions
 
-	//This part is for testing which platforms are colliding with the player
-	bool isColliding = false;
+	//This part is for testing which platforms are colliding with the enemies
+	for (int i = 0; i < enemys.size(); i++) {
+		bool isColliding = false;
 
-	for (vector<Platform*>::iterator it = platforms.begin();
-		it != platforms.end(); it++) {
+		for (vector<Platform*>::iterator it = platforms.begin();
+			it != platforms.end(); it++) {
 
-		Platform * platform = *it;
+			Platform * platform = *it;
 
-		//For handling collisions
-		isColliding = enemy.boundingBox.SAT2D(platform->boundingBox);
+			//For handling collisions
+			isColliding = enemys[i]->boundingBox.SAT2D(platform->boundingBox);
 
-		//if it's colliding with the ground then set the collision status to that object corresponding to that object
-		if (isColliding) {
-			enemy.areCollidingPlatform = true;
-			enemy.collisionStatuses.push_back(platform->typeOfCollision(enemy, dt));
+			//if it's colliding with the ground then set the collision status to that object corresponding to that object
+			if (isColliding) {
+				enemys[i]->areCollidingPlatform = true;
+				enemys[i]->collisionStatuses.push_back(platform->typeOfCollision(*enemys[i], dt));
+			}
+		}
+
+		//so the player is not colliding with anything at all
+		if (enemys[i]->collisionStatuses.empty()) {
+			enemys[i]->areCollidingPlatform = false;
 		}
 	}
-
-	//so the player is not colliding with anything at all
-	if (enemy.collisionStatuses.empty()) {
-		enemy.areCollidingPlatform = false;
-	}
+	
 	
 	if (player.livesLeft <= 0) {
 		displayDefeat = true;
@@ -1099,7 +1253,7 @@ void reshape(int width, int height)		// Resize the OpenGL window
 	glMatrixMode(GL_MODELVIEW);							// Select the modelview matrix stack
 	glLoadIdentity();									// Reset the top of the modelview matrix to an identity matrix
 
-	BuildFont((int)round((double)screenHeight / 30.0), (int)round((double)screenHeight / 60.0));
+	BuildFont((int)round((double)screenHeight / 40.0), (int)round((double)screenHeight / 75.0));
 	
 }
 
@@ -1108,24 +1262,24 @@ void rescaleWindow() {
 	//For adjusting the viewport when the character is hitting the edge of it
 	//For the Xdirection
 	//the left edge
-	if ((player.XPla-Xdir) < (screenWidth*2.0*0.2f)) {
+	if ((player.XPla-Xdir) < (screenWidth*2.0*0.4f)) {
 		//Xdir is the X direction of the viewport to move, 
-		Xdir = player.XPla - (screenWidth*2.0*0.2f) + 0.5f*(player.Xspeed+player.oldXspeed)*dt;
+		Xdir = player.XPla - (screenWidth*2.0*0.4f) + 0.5f*(player.Xspeed+player.oldXspeed)*dt;
 	}
 	//the right edge
-	else if ((player.XPla-Xdir) > (screenWidth*2.0*0.6f)) {
-		Xdir = (player.XPla -( screenWidth * 2.0*0.6f) + 0.5f*(player.Xspeed + player.oldXspeed)*dt);
+	else if ((player.XPla-Xdir) > (screenWidth*2.0*0.42f)) {
+		Xdir = (player.XPla -( screenWidth * 2.0*0.42f) + 0.5f*(player.Xspeed + player.oldXspeed)*dt);
 	}
 	
 
 	//For the Ydirection
 	//the bottom edge
-	if (player.YPla < (screenHeight*2.0*0.154f - 0.416f*screenHeight*2.0)) {
-		Ydir = player.YPla - (screenHeight*2.0*0.05f - 0.416f*screenHeight*2.0) + 0.5f*(player.Yspeed + player.oldYspeed)*dt;
+	if (player.YPla < (screenHeight*2.0*0.154f - 0.3f*screenHeight*2.0)) {
+		Ydir = player.YPla - (screenHeight*2.0*0.05f - 0.3f*screenHeight*2.0) + 0.5f*(player.Yspeed + player.oldYspeed)*dt;
 	}
 	//the top edge
-	else if (player.YPla > (screenHeight*2.0*0.6f)) {
-		Ydir = (player.YPla - screenHeight * 2.0*0.6f + 0.5f*(player.Yspeed + player.oldYspeed)*dt);
+	else if (player.YPla > (screenHeight*2.0*0.4f)) {
+		Ydir = (player.YPla - screenHeight * 2.0*0.4f + 0.5f*(player.Yspeed + player.oldYspeed)*dt);
 	}
 }
 
@@ -1163,7 +1317,7 @@ void init()
 														//will clear the buffer to this colour.
 
 
-	BuildFont((int)round((double)screenHeight / 30.0), (int)round((double)screenHeight / 60.0));
+	BuildFont((int)round((double)screenHeight / 35.0), (int)round((double)screenHeight / 75.0));
 
 	//Only call loadPNG on the background
 	background = loadPNG("Sprites/background.png");
@@ -1181,15 +1335,34 @@ void init()
 	startGameButtonIcon = loadPNG("Sprites/astronautStill.png");
 	instructionsButtonIcon = loadPNG("Sprites/background.png");
 
+	
 	player.loadTexture("Sprites/astronautStill.png");
-	enemy.loadTexture("Sprites/alienSprites/alien_predator_mask/predatormask__0000_idle_1.png");
-	ground.loadTexture("Sprites/ground2.png");
+	
 	spaceship.loadTexture("Sprites/spaceshipStill.png");
 
-	plat1.loadTexture("Sprites/platform3by2.png");
-	plat2.loadTexture("Sprites/platform3by2.png");
-	plat3.loadTexture("Sprites/platform7by2.png");
-	plat4.loadTexture("Sprites/platform7by2.png");
+	groundPlat1.loadTexture("Sprites/platform22by2.png");
+	groundPlat2.loadTexture("Sprites/platform5by2.png");
+	groundPlat3.loadTexture("Sprites/platform12by2.png");
+	lev1Plat1.loadTexture("Sprites/platform5by2.png");
+	lev2Plat1.loadTexture("Sprites/platform7by2.png");
+	lev3Plat1.loadTexture("Sprites/platform17by2.png");
+	lev4Plat1.loadTexture("Sprites/platform12by2.png");
+	lev5Plat1.loadTexture("Sprites/platform12by2.png");
+	lev5Plat2.loadTexture("Sprites/platform12by2.png");
+	lev6Plat1.loadTexture("Sprites/platform17by2.png");
+	lev7Plat1.loadTexture("Sprites/platform12by2.png");
+	lev8Plat1.loadTexture("Sprites/platform12by2.png");
+	lev8Plat2.loadTexture("Sprites/platform12by2.png");
+	lev8Plat3.loadTexture("Sprites/platform29by2.png");
+
+	enemy1.loadTexture("Sprites/alien/blue/blue_walk1.png");
+	enemy2.loadTexture("Sprites/alien/blue/blue_walk1.png");
+	enemy3.loadTexture("Sprites/alien/blue/blue_walk1.png");
+	enemy4.loadTexture("Sprites/alien/blue/blue_walk1.png");
+	enemy5.loadTexture("Sprites/alien/blue/blue_walk1.png");
+	enemy6.loadTexture("Sprites/alien/blue/blue_walk1.png");
+	enemy7.loadTexture("Sprites/alien/blue/blue_walk1.png");
+	
 }
 
 void processKeys()
@@ -1543,9 +1716,9 @@ int WINAPI WinMain(	HINSTANCE	hInstance,			// Instance
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	//For displaying a command line console
-	AllocConsole();
-	FILE *stream;
-	freopen_s(&stream, "CONOUT$", "w", stdout);
+	//AllocConsole();
+	//FILE *stream;
+	//freopen_s(&stream, "CONOUT$", "w", stdout);
 	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	// Create Our OpenGL Window

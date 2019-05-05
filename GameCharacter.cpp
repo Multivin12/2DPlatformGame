@@ -114,7 +114,7 @@ void GameCharacter::loadTexture(string texturePath) {
 
 	texturePath.copy(cstr, texturePath.size() + 1);
 	cstr[texturePath.size()] = '\0';
-
+	
 	textureID = loadPNG(cstr);
 }
 

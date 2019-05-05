@@ -23,6 +23,8 @@ public:
 	bool jumpPressed = false;
 	float jumpSpeed = 70.0f;
 
+	float originalXspeed = 0.0f;
+
 	NPC(float Xspeed, string colour, float distanceTravelled, int lives, int damageInflicted,bool jumping, float jumpSpeed);
 	void updatePlayerMovement(double dt);
 	void typeOfCollision(PlayerCharacter &p, double dt);

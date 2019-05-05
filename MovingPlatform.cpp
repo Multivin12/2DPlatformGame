@@ -8,6 +8,7 @@ MovingPlatform::MovingPlatform(double Xspeed, double distanceTravelledX, double 
 	this->distanceTravelledX = distanceTravelledX;
 	this->Yspeed = Yspeed;
 	this->distanceTravelledY = distanceTravelledY;
+	this->originalXspeed = Xspeed;
 }
 
 /*
@@ -70,16 +71,31 @@ void MovingPlatform::updatePlatformMovement(double dt) {
 	//equation for updating displacement
 	XPla += 0.5f*(Xspeed + oldXspeed)*dt;
 
-	if (XPla > distanceTravelledX || XPla < 0.0f) {
-		if (XPla < 0.0f) {
-			XPla = 0.0f;
+	if (originalXspeed > 0) {
+		if (XPla > distanceTravelledX || XPla < 0.0f) {
+			if (XPla < 0.0f) {
+				XPla = 0.0f;
+			}
+			if (XPla > distanceTravelledX) {
+				XPla = distanceTravelledX;
+			}
+			oldXspeed = -oldXspeed;
+			Xspeed = -Xspeed;
 		}
-		if (XPla > distanceTravelledX) {
-			XPla = distanceTravelledX;
-		}
-		oldXspeed = -oldXspeed;
-		Xspeed = -Xspeed;
 	}
+	else {
+		if (XPla < -distanceTravelledX || XPla > 0.0f) {
+			if (XPla > 0.0f) {
+				XPla = 0.0f;
+			}
+			if (XPla < -distanceTravelledX) {
+				XPla = -distanceTravelledX;
+			}
+			oldXspeed = -oldXspeed;
+			Xspeed = -Xspeed;
+		}
+	}
+	
 
 
 	//Now update the Y movements
