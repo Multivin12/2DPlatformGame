@@ -62,7 +62,7 @@ NPC enemy4(25.0f, "red", 1400.0f, 1, 1, false, 70.0f);
 NPC enemy5(-25.0f, "red", 1400.0f, 1, 1, false, 70.0f);
 NPC enemy6(15.0f, "armour", 900.0f, 2, 1, false, 70.0f);
 NPC enemy7(25.0f, "boss", 2500.0f, 2, 2, true, 70.0f);
-vector<NPC*> enemys = {&enemy1,&enemy2,&enemy3,&enemy4 ,&enemy5,&enemy6,&enemy7 };
+vector<NPC*> enemys = {&enemy1,&enemy2,&enemy4,&enemy6,&enemy7 };
 
 
 //List of platforms
@@ -91,7 +91,7 @@ vector<MovingPlatform*> movingPlatforms = { &lev2Plat1,&lev5Plat1 ,&lev5Plat2,&l
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.0000075; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.000003; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
 										//0.0000075 recommended for PC, 0.000003 for my laptop.
 double counter = 0;
@@ -361,12 +361,14 @@ void displayWorld() {
 	glPopMatrix();
 
 	/////////////////////////////////////////////////////////////////////
+	/*
 	glPushMatrix();
 		glTranslatef(-Xdir + enemy3.XPla, -Ydir + enemy3.YPla, 0.0);
 		enemy3.addPointsandDraw(1000, 1320, 1000, 1470, 1100, 1470, 1100, 1320);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		enemy3.createOBB(matrix);
 	glPopMatrix();
+	*/
 	/////////////////////////////////////////////////////////////////////
 
 	glColor3f(1, 1, 1);
@@ -404,12 +406,14 @@ void displayWorld() {
 		enemy4.createOBB(matrix);
 	glPopMatrix();
 
+	/*
 	glPushMatrix();
 		glTranslatef(-Xdir + enemy5.XPla, -Ydir + enemy5.YPla, 0.0);
 		enemy5.addPointsandDraw(7140, 1920, 7140, 2070, 7240, 2070, 7240, 1920);
 		glGetFloatv(GL_MODELVIEW_MATRIX, matrix);
 		enemy5.createOBB(matrix);
 	glPopMatrix();
+	*/
 	/////////////////////////////////////////////////////////////////////
 
 	glColor3f(1, 1, 1);
@@ -565,7 +569,7 @@ void detectCollisions() {
 		}
 
 		//NPC Collisions
-		//This part is for testing which platforms are colliding with the player
+		//This part is for testing which NPCs are colliding with the player
 		isColliding = false;
 
 		for (vector<NPC*>::iterator it = enemys.begin();
@@ -602,21 +606,40 @@ void detectCollisions() {
 	//This part is for testing which platforms are colliding with the enemies
 	for (int i = 0; i < enemys.size(); i++) {
 		bool isColliding = false;
+		Platform * platform = NULL;
 
-		for (vector<Platform*>::iterator it = platforms.begin();
-			it != platforms.end(); it++) {
-
-			Platform * platform = *it;
-
-			//For handling collisions
-			isColliding = enemys[i]->boundingBox.SAT2D(platform->boundingBox);
-
-			//if it's colliding with the ground then set the collision status to that object corresponding to that object
-			if (isColliding) {
-				enemys[i]->areCollidingPlatform = true;
-				enemys[i]->collisionStatuses.push_back(platform->typeOfCollision(*enemys[i], dt));
-			}
+		//i corresponds to the NPC number
+		if (i == 0) {
+			platform = platforms[2];
 		}
+		else if (i == 1) {
+			platform = platforms[5];
+		}
+		//else if (i == 2) {
+			//platform = platforms[6];
+		//}
+		else if (i == 2) {
+			platform = platforms[9];
+		}
+		//else if (i == 3) {
+			//platform = platforms[8];
+		//}
+		else if (i == 3) {
+			platform = platforms[10];
+		}
+		else if (i == 4) {
+			platform = platforms[13];
+		}
+
+		//For handling collisions
+		isColliding = enemys[i]->boundingBox.SAT2D(platform->boundingBox);
+
+		//if it's colliding with the ground then set the collision status to that object corresponding to that object
+		if (isColliding) {
+			enemys[i]->areCollidingPlatform = true;
+			enemys[i]->collisionStatuses.push_back(platform->typeOfCollision(*enemys[i], dt));
+		}
+			
 
 		//so the player is not colliding with anything at all
 		if (enemys[i]->collisionStatuses.empty()) {
@@ -1357,9 +1380,9 @@ void init()
 
 	enemy1.loadTexture("Sprites/alien/blue/blue_walk1.png");
 	enemy2.loadTexture("Sprites/alien/blue/blue_walk1.png");
-	enemy3.loadTexture("Sprites/alien/blue/blue_walk1.png");
+	//enemy3.loadTexture("Sprites/alien/blue/blue_walk1.png");
 	enemy4.loadTexture("Sprites/alien/blue/blue_walk1.png");
-	enemy5.loadTexture("Sprites/alien/blue/blue_walk1.png");
+	//enemy5.loadTexture("Sprites/alien/blue/blue_walk1.png");
 	enemy6.loadTexture("Sprites/alien/blue/blue_walk1.png");
 	enemy7.loadTexture("Sprites/alien/blue/blue_walk1.png");
 	
