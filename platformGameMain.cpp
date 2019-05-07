@@ -97,7 +97,7 @@ vector<MovingPlatform*> movingPlatforms = { &lev2Plat1,&lev5Plat1 ,&lev5Plat2,&l
 //Simulation properties
 double dt = 0;
 __int64 prevTime = 0;
-double timeFrequencyRecip = 0.0000065; // Only needs to be changed to change speed of simulation but is platform independent
+double timeFrequencyRecip = 0.0000028; // Only needs to be changed to change speed of simulation but is platform independent
 										// Smaller values will slow down the simulation, larger values will speed it up
 										//0.0000075 recommended for PC, 0.000003 for my laptop.
 double counter = 0;
