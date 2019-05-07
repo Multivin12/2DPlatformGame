@@ -26,7 +26,7 @@ NPC::NPC(float Xspeed, string colour, float distanceTravelled,int lives,int dama
 /*
    Method for determining the type of collision the player has made with this NPC.
 */
-void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
+void NPC::typeOfCollision(PlayerCharacter &p, double dt,ISoundEngine * s) {
 
 	if (!isDead) {
 		OBB npc = boundingBox;
@@ -41,12 +41,14 @@ void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
 				if (livesLeft == 0) {
 					isDead = true;
 				}
+				s->play2D("audio/boing.wav", GL_FALSE);
 			}
 			//bottom side
 			else if (npc.getMinY() >= player.getMaxY() - 32.0*dt) {
 				p.Yspeed = -0.5f*p.Yspeed;
 				p.livesLeft -= damageInflicted;
 				p.coolDown = true;
+				s->play2D("audio/ouch.wav", GL_FALSE);
 			}
 			else {
 				//right side
@@ -60,22 +62,18 @@ void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
 				}
 				p.livesLeft -= damageInflicted;
 				p.coolDown = true;
+				s->play2D("audio/ouch.wav", GL_FALSE);
 			}
 		}
 		else {
-			if (npc.getMaxY() <= player.getMinY() + 128.0*dt) {
-				p.Yspeed = -p.Yspeed;
+			if (npc.getMaxY() <= player.getMinY() + 64.0*dt) {
+				p.Yspeed = 40;
 				textureNumber = 0;
 				livesLeft--;
 				if (livesLeft == 0) {
 					isDead = true;
 				}
-			}
-			//bottom side
-			else if (npc.getMinY() >= player.getMaxY() - 48.0*dt) {
-
-			}
-			else {
+				s->play2D("audio/boing.wav", GL_FALSE);
 			}
 		}
 	}

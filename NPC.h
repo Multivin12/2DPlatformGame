@@ -3,8 +3,11 @@
 #include "OBB.h"
 #include "GameCharacter.h"
 #include "playerCharacter.h"
+#include "irrKlang-1.6.0/include/irrKlang.h"
 #include <string>
 #include <vector>
+
+using namespace irrklang;
 
 class NPC : public GameCharacter
 {
@@ -27,7 +30,7 @@ public:
 
 	NPC(float Xspeed, string colour, float distanceTravelled, int lives, int damageInflicted,bool jumping, float jumpSpeed);
 	void updatePlayerMovement(double dt);
-	void typeOfCollision(PlayerCharacter &p, double dt);
+	void typeOfCollision(PlayerCharacter &p, double dt,ISoundEngine * s);
 	void resetCharacter();
 	~NPC();
 

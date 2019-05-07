@@ -3,6 +3,7 @@
 //and draws a spinning rectangle
 
 #include <windows.h>		// Header file for Windows
+#include "irrKlang-1.6.0/include/irrKlang.h"
 #include <iostream>
 #include <fstream>
 #include <string>			// used for strings
@@ -22,6 +23,9 @@
 #include "Duration.h"
 
 using namespace std;
+using namespace irrklang;
+
+ISoundEngine *SoundEngine = createIrrKlangDevice();
 
 //Variables for the screenSize and the keys
 int screenWidth=640, screenHeight=640;
@@ -38,6 +42,8 @@ bool displayEnterName = false;
 bool instructionsIconLoaded = false;
 bool startGameIconLoaded = false;
 string typedName = "";
+
+bool playScream = true;
 
 //for storing the loaded in file data
 vector<string> names = {};
@@ -245,6 +251,7 @@ void resetWorld() {
 	typedName = "";
 	names.clear();
 	times.clear();
+	playScream = true;
 }
 
 void displayWorld() {
@@ -479,6 +486,16 @@ void displayWorld() {
 		spaceship.createOBB(matrix);
 	glPopMatrix();
 
+	if (playScream) {
+		if (player.YPla < -120) {
+			SoundEngine->play2D("audio/scream.mp3", GL_FALSE);
+			playScream = false;
+		}
+	}
+	
+	if (player.YPla == 0) {
+		playScream = true;
+	}
 }
 
 void displayScore() {
@@ -625,7 +642,7 @@ void detectCollisions() {
 			isColliding = player.boundingBox.SAT2D(npc->boundingBox);
 
 			if (isColliding) {
-				npc->typeOfCollision(player, dt);
+				npc->typeOfCollision(player, dt, SoundEngine);
 			}
 		}
 
@@ -637,6 +654,11 @@ void detectCollisions() {
 			player.Yspeed = 2.0f;
 			spaceship.Yspeed = 2.0f;
 			spaceship.loadTexture("Sprites/spaceshipLiftOff.png");
+
+
+			SoundEngine->play2D("audio/woohoo.flac", GL_FALSE);
+			SoundEngine->play2D("audio/liftoff.wav", GL_FALSE);
+			
 		}
 	}
 	else {
@@ -1429,7 +1451,6 @@ void init()
 	//enemy5.loadTexture("Sprites/alien/blue/blue_walk1.png");
 	enemy6.loadTexture("Sprites/alien/blue/blue_walk1.png");
 	enemy7.loadTexture("Sprites/alien/blue/blue_walk1.png");
-	
 }
 
 void processKeys()
@@ -1456,6 +1477,7 @@ void processKeys()
 				player.oldYspeed = 0.0f;
 				player.Yspeed = 70.0f;
 				player.jumpPressed = true;
+				SoundEngine->play2D("audio/jump.wav", GL_FALSE);
 			}
 
 			player.jumpCounter++;
