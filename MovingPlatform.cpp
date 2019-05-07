@@ -49,8 +49,15 @@ std::string MovingPlatform::typeOfCollision(GameCharacter& p,double dt) {
 
 	//if you've gotten here it's a side collision
 	//need the if statement otherwise it gets stuck on the side
-	p.oldXspeed = -Xspeed;
-	p.Xspeed = -Xspeed;
+	if (Xspeed > 0) {
+		p.oldXspeed = -Xspeed;
+		p.Xspeed = -Xspeed;
+	}
+	else {
+		p.oldXspeed = -Xspeed*2.0;
+		p.Xspeed = -Xspeed*2.0;
+	}
+	
 	return "side";
 }
 

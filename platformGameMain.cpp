@@ -527,7 +527,7 @@ void displayScore() {
 		hourString = std::to_string(gameTime.hours);
 	}
 
-	glRasterPos2f(screenWidth * 2*0.6, screenHeight * 2 - 100);
+	glRasterPos2f(screenWidth * 2*0.6, screenHeight * 2 - 150);
 	glColor3f(1.0, 1.0, 1.0);
 	glPrint("Time Taken: " + hourString + ":" + minString + ":" + secString);	// Print GL Text To The Screen
 
@@ -540,7 +540,7 @@ void displayScore() {
 	glBindTexture(GL_TEXTURE_2D, livesIcon);
 	for (int i = 0; i < player.livesLeft; i++) {
 		glPushMatrix();
-			glTranslatef(Xdirection, screenHeight*2.0 - 150.0, 0.0);
+			glTranslatef(Xdirection, screenHeight*2.0 - 200.0, 0.0);
 			glBegin(GL_QUADS);
 				glTexCoord2f(0, 0); glVertex2f(0, 0);
 				glTexCoord2f(0, 1); glVertex2f(0, 100);

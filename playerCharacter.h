@@ -10,7 +10,7 @@ class PlayerCharacter: public GameCharacter
 public:
 
 	//variables to control when a button has been pressed or not
-	bool jumpPressed = false;
+	bool jumpPressed = true;
 	bool leftPressed = false;
 	bool rightPressed = false;
 	//counter to count how long the jump button has been hold down for
