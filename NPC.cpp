@@ -34,8 +34,8 @@ void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
 
 		//top side
 		if (!p.coolDown) {
-			if (npc.getMaxY() <= player.getMinY() + 128.0*dt) {
-				p.Yspeed = -p.Yspeed;
+			if (npc.getMaxY() <= player.getMinY() + 64.0*dt) {
+				p.Yspeed = 40;
 				textureNumber = 0;
 				livesLeft--;
 				if (livesLeft == 0) {
@@ -43,7 +43,7 @@ void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
 				}
 			}
 			//bottom side
-			else if (npc.getMinY() >= player.getMaxY() - 48.0*dt) {
+			else if (npc.getMinY() >= player.getMaxY() - 32.0*dt) {
 				p.Yspeed = -0.5f*p.Yspeed;
 				p.livesLeft -= damageInflicted;
 				p.coolDown = true;
@@ -51,11 +51,11 @@ void NPC::typeOfCollision(PlayerCharacter &p, double dt) {
 			else {
 				//right side
 				p.Yspeed = 70.0f;
-				if (npc.getMaxX() <= player.getMinX() + 64.0*dt) {
+				if (npc.getMaxX() <= player.getMinX() + 32.0*dt) {
 					p.Xspeed = Xspeed * 2.0;
 				}
 				//left side
-				else if (npc.getMinX() >= player.getMaxX() - 64.0*dt) {
+				else if (npc.getMinX() >= player.getMaxX() - 32.0*dt) {
 					p.Xspeed = Xspeed * 2.0;
 				}
 				p.livesLeft -= damageInflicted;

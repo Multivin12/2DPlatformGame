@@ -57,9 +57,9 @@ Spaceship spaceship;
 //enemys xspeed, the colour, the max X distance, num lives, damage inflicted, whether the enemy can jump and the speed of the jump
 NPC enemy1(10.0f,"blue", 1200.0f,1,1,false,70.0f);
 NPC enemy2(15.0f, "green", 1100.0f, 1, 1,true, 70.0f);
-NPC enemy3(25.0f, "red", 700.0f, 1, 1, false, 70.0f);
+//NPC enemy3(25.0f, "red", 700.0f, 1, 1, false, 70.0f);
 NPC enemy4(25.0f, "red", 1400.0f, 1, 1, false, 70.0f);
-NPC enemy5(-25.0f, "red", 1400.0f, 1, 1, false, 70.0f);
+//NPC enemy5(-25.0f, "red", 1400.0f, 1, 1, false, 70.0f);
 NPC enemy6(15.0f, "armour", 900.0f, 2, 1, false, 70.0f);
 NPC enemy7(25.0f, "boss", 2500.0f, 2, 2, true, 70.0f);
 vector<NPC*> enemys = {&enemy1,&enemy2,&enemy4,&enemy6,&enemy7 };
@@ -545,9 +545,52 @@ void detectCollisions() {
 
 		//This part is for testing which platforms are colliding with the player
 		bool isColliding = false;
+		vector<Platform*> platformsToTest = {};
+		vector<NPC*> enemiesToTest = {};
+		int increment = 50;
 
-		for (vector<Platform*>::iterator it = platforms.begin();
-			it != platforms.end(); it++) {
+		if (player.YPla > 0-increment && player.YPla < 180+increment) {
+			platformsToTest = { &groundPlat1,&groundPlat2,&groundPlat3,&lev1Plat1};
+			enemiesToTest = {&enemy1};
+		} else if (player.YPla > 300-increment && player.YPla < 480+increment) {
+			platformsToTest = { &groundPlat1,&groundPlat2,&groundPlat3,&lev1Plat1,&lev2Plat1};
+			enemiesToTest = {};
+		}
+		else if (player.YPla > 600 - increment && player.YPla < 780 + increment) {
+			platformsToTest = { &lev1Plat1,&lev2Plat1,&lev3Plat1 };
+			enemiesToTest = {};
+		}
+		else if (player.YPla > 900 - increment && player.YPla < 1080 + increment) {
+			platformsToTest = { &lev2Plat1,&lev3Plat1,&lev4Plat1 };
+			enemiesToTest = { &enemy2 };
+		}
+		else if (player.YPla > 1200 - increment && player.YPla < 1380 + increment) {
+			platformsToTest = { &lev3Plat1,&lev4Plat1,&lev5Plat1,&lev5Plat2 };
+			enemiesToTest = { &enemy2 };
+		}
+		else if (player.YPla > 1500 - increment && player.YPla < 1680 + increment) {
+			platformsToTest = { &lev4Plat1,&lev5Plat1,&lev5Plat2,&lev6Plat1 };
+			enemiesToTest = {};
+		}
+		else if (player.YPla > 1800 - increment && player.YPla < 1980 + increment) {
+			platformsToTest = { &lev5Plat1,&lev5Plat2,&lev6Plat1,&lev7Plat1 };
+			enemiesToTest = {&enemy4};
+		}
+		else if (player.YPla > 2100 - increment && player.YPla < 2280 + increment) {
+			platformsToTest = { &lev6Plat1,&lev7Plat1,&lev8Plat1,&lev8Plat2,&lev8Plat3 };
+			enemiesToTest = {&enemy6};
+		}
+		else if (player.YPla > 2400 - increment && player.YPla < 2580 + increment) {
+			platformsToTest = { &lev7Plat1,&lev8Plat1,&lev8Plat2,&lev8Plat3 };
+			enemiesToTest = {&enemy7};
+		}
+		else  {
+			platformsToTest = {};
+			enemiesToTest = { &enemy7 };
+		}
+
+		for (vector<Platform*>::iterator it = platformsToTest.begin();
+			it != platformsToTest.end(); it++) {
 
 			Platform * platform = *it;
 
@@ -560,6 +603,7 @@ void detectCollisions() {
 				player.collisionStatuses.push_back(platform->typeOfCollision(player, dt));
 			}
 		}
+		platformsToTest.clear();
 
 		//so the player is not colliding with anything at all
 		if (player.collisionStatuses.empty()) {
@@ -572,8 +616,8 @@ void detectCollisions() {
 		//This part is for testing which NPCs are colliding with the player
 		isColliding = false;
 
-		for (vector<NPC*>::iterator it = enemys.begin();
-			it != enemys.end(); it++) {
+		for (vector<NPC*>::iterator it = enemiesToTest.begin();
+			it != enemiesToTest.end(); it++) {
 
 			NPC * npc = *it;
 
@@ -1696,6 +1740,9 @@ void update()
 
 	if (!displayMenuScreen && !displayInstructions && !displayWin && !displayDefeat && !displayEnterName) {
 
+		if (dt > 1.0) {
+			dt = 0.0f;
+		}
 		player.updatePlayerMovement(dt);
 
 		for (int i = 0; i < movingPlatforms.size(); i++) {
